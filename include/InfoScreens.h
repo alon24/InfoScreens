@@ -259,7 +259,7 @@ public:
 				return;
 			}
 			if (paramValueMap["currentPage"].dirty) {
-				debugf("currentPage = %i, paramValueMap['currentPage'].dirty= %d",paramValueMap["currentPage"].val.toInt(), (int)paramValueMap["currentPage"].dirty);
+//				debugf("currentPage = %i, paramValueMap['currentPage'].dirty= %d",paramValueMap["currentPage"].val.toInt(), (int)paramValueMap["currentPage"].dirty);
 				display->clearDisplay();
 				display->setCursor(0,0);
 				print(paramValueMap["currentPage"].val.toInt());
@@ -269,15 +269,20 @@ public:
 				internalCanUpdateDisplay = false;
 				Vector<paramStruct*> params = getCurrent()->getAllParamsInPage();
 //				debugf("params in page = %i", params.size());
+				boolean updated = false;
 				for (int i = 0; i < params.size(); ++i) {
 					paramStruct* param = params.get(i);
 					if (paramValueMap[param->id].dirty) {
 //						debugf("updating param %s", param->id.c_str());
 						display->writeover(param->t, paramValueMap[param->id].val);
 						paramValueMap[param->id].clearDirty();
+						updated = true;
 					}
 				}
 				internalCanUpdateDisplay = true;
+				if (updated) {
+					display->display();
+				}
 			}
 		}
 	}
@@ -419,7 +424,7 @@ public:
 	}
 
 	InfoPage* get(int index) {
-		debugf("index = %i, children sze  %i", index, mChildern.size());
+//		debugf("index = %i, children size  %i", index, mChildern.size());
 		if (mChildern.size() >= index) {
 			return mChildern.get(index);
 		}
@@ -469,9 +474,9 @@ private:
 		internalCanUpdateDisplay = false;
 
 		InfoPage* p = get(pIndex);
-		debugf("print,3 %s", p->getId().c_str() );
+//		debugf("print,3 %s", p->getId().c_str() );
 		p->print();
-		debugf("print, 4");
+//		debugf("print, 4");
 
 //		resetAllParamsDirtyState(pIndex);
 		internalCanUpdateDisplay = true;

@@ -22,6 +22,9 @@ bool state = true;
 InfoScreens *infos;
 String currentTime = "00:00:00";
 
+Timer updater;
+Timer updater2;
+
 //Bounce bouncer = Bounce( BTN_PIN, 5 );
 
 void blink()
@@ -34,13 +37,13 @@ void buttonHandler() {
 	int btnState =  digitalRead(BTN_PIN);
 	debugf( "pin %i, state is %i", BTN_PIN, btnState);
 	if(btnState == 1) {
-		infos->count();
+		infos->moveRight();
 	}
 }
 
 void initInfoScreens() {
 	InfoPage* p1 = infos->createPage("Main", "Main");
-	InfoLine* el = p1->createLine("header", "Test1");
+	InfoLine* el = p1->createLine("header1", "P1Test");
 	//add the time param
 	el->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 //	t->t.x = getXOnScreenForString(currentTime, 1);
@@ -53,7 +56,28 @@ void initInfoScreens() {
 
 	p1->createLine("ssid", "ID: ")->addParam("ssid", "");
 
-	InfoPage* p2 = infos->createPage("M", "M");
+	InfoPage* p2 = infos->createPage("P2", "P2");
+	InfoLine* el2 = p2->createLine("header2", "P2Test");
+	//add the time param
+	el2->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
+
+	p2->createLine("4", "sta:")->addParam("station", "0.0.0.0");
+	InfoLine* el22 = p2->createLine("2", "apdd: ");
+	el22->addParam("ap", "0.0.0.0");
+
+	InfoPage* p3 = infos->createPage("P3", "P3");
+	p3->createLine("header3", "P3Test")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
+	p3->createLine("4", "ap:")->addParam("ap", "0.0.0.0");
+}
+
+void handleUpdateTimer() {
+	currentTime = SystemClock.now().toShortTimeString(true);
+//	debugf("handleUpdateTimer time=%s", currentTime.c_str() );
+	infos->updateParamValue("time", currentTime);
+}
+
+void handle2UpdateTimer() {
+	infos->updateParamValue("ap", String(millis()));
 }
 
 void init()
@@ -68,10 +92,10 @@ void init()
 	display.setTextSize(1);
 	display.setTextColor(WHITE);
 
-	display.print("ilan");
-	display.display();
+//	display.print("Testing display");
+//	display.display();
 
-	infos = new InfoScreens("SousVide", &display);
+	infos = new InfoScreens("InfoScreens", &display);
 	initInfoScreens();
 	infos->show();
 
@@ -80,4 +104,7 @@ void init()
 
 	pinMode(LED_PIN, OUTPUT);
 	procTimer.initializeMs(1000, blink).start();
+
+	updater.initializeMs(300, handleUpdateTimer).start();
+	updater2.initializeMs(120, handle2UpdateTimer).start();
 }
