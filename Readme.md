@@ -12,4 +12,4 @@ sdaPin 6
 push button switch 0:</br>
 relayPin 2
 
-<!-- [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/fo02opoEktk/0.jpg)](https://www.youtube.com/watch?v=fo02opoEktk) -->
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/rMo8-ImagDo/0.jpg)](https://www.youtube.com/watch?v=rMo8-ImagDo)
