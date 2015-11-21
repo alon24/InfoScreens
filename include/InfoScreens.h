@@ -187,9 +187,11 @@ public:
 	Vector<paramStruct*> getAllParamsInPage() {
 		Vector<paramStruct*> ret;
 		for (int i = 0; i < mChildren.size(); ++i) {
+//			debugf("222");
 			InfoLine* l = mChildren.elementAt(i);
 			//add all the params in the line
-			for (int j = 0; j < l->params.size(); ++i) {
+			for (int j = 0; j < l->params.size(); ++j) {
+//				debugf("333");
 				ret.add(l->params.elementAt(j));
 			}
 		}
@@ -249,30 +251,34 @@ private:
 
 public:
 	void handleUpdateTimer() {
-		debugf("can updatedisplay=%i", canUpdateDisplay());
+//		debugf("can updatedisplay=%i", canUpdateDisplay());
 		if(canUpdateDisplay() && internalCanUpdateDisplay) {
 			if (mChildern.size() == 0) {
 				debugf("I cannot print anything, no Pages declared, setting to NOT update display");
 				setCanUpdateDisplay(false);
 				return;
 			}
-			debugf("currentPage = %i, paramValueMap['currentPage'].dirty= %d",paramValueMap["currentPage"].val.toInt(), (int)paramValueMap["currentPage"].dirty);
 			if (paramValueMap["currentPage"].dirty) {
+				debugf("currentPage = %i, paramValueMap['currentPage'].dirty= %d",paramValueMap["currentPage"].val.toInt(), (int)paramValueMap["currentPage"].dirty);
 				display->clearDisplay();
 				display->setCursor(0,0);
 				print(paramValueMap["currentPage"].val.toInt());
 				paramValueMap["currentPage"].clearDirty();
 			}
-//			else {
-//				Vector<paramStruct*> params = getCurrent()->getAllParamsInPage();
-//				for (int i = 0; i < params.size(); ++i) {
-//					paramStruct* param = params.get(i);
-//					if (paramValueMap[param->id].dirty) {
-//						display->writeover(param->t, paramValueMap[param->id].val);
-//						paramValueMap[param->id].clearDirty();
-//					}
-//				}
-//			}
+			else {
+				internalCanUpdateDisplay = false;
+				Vector<paramStruct*> params = getCurrent()->getAllParamsInPage();
+//				debugf("params in page = %i", params.size());
+				for (int i = 0; i < params.size(); ++i) {
+					paramStruct* param = params.get(i);
+					if (paramValueMap[param->id].dirty) {
+//						debugf("updating param %s", param->id.c_str());
+						display->writeover(param->t, paramValueMap[param->id].val);
+						paramValueMap[param->id].clearDirty();
+					}
+				}
+				internalCanUpdateDisplay = true;
+			}
 		}
 	}
 
