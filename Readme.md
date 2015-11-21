@@ -63,4 +63,10 @@ Now update a value:
   }
 ```
 
+Move right (you can also moveleft) - show a different page
+```
+infos->moveRight();
+infos->moveLeft();
+```
+
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/rMo8-ImagDo/0.jpg)](https://www.youtube.com/watch?v=rMo8-ImagDo)
