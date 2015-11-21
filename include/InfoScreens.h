@@ -191,7 +191,6 @@ public:
 			InfoLine* l = mChildren.elementAt(i);
 			//add all the params in the line
 			for (int j = 0; j < l->params.size(); ++j) {
-//				debugf("333");
 				ret.add(l->params.elementAt(j));
 			}
 		}
@@ -270,12 +269,23 @@ public:
 				Vector<paramStruct*> params = getCurrent()->getAllParamsInPage();
 //				debugf("params in page = %i", params.size());
 				boolean updated = false;
+
+
+				//need localcopy of params
+				Vector<String> tempIds;
 				for (int i = 0; i < params.size(); ++i) {
 					paramStruct* param = params.get(i);
-					if (paramValueMap[param->id].dirty) {
+					if(paramValueMap[param->id].dirty) {
+						tempIds.add(param->id);
+						paramValueMap[param->id].clearDirty();
+					}
+				}
+
+				for (int i = 0; i < params.size(); ++i) {
+					paramStruct* param = params.get(i);
+					if (tempIds.contains(param->id)) {
 //						debugf("updating param %s", param->id.c_str());
 						display->writeover(param->t, paramValueMap[param->id].val);
-						paramValueMap[param->id].clearDirty();
 						updated = true;
 					}
 				}

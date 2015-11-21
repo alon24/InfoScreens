@@ -54,7 +54,9 @@ void initInfoScreens() {
 	InfoLine* el4 = p1->createLine("4", "sta:");
 	el4->addParam("station", "0.0.0.0");
 
-	p1->createLine("ssid", "ID: ")->addParam("ssid", "");
+	p1->createLine("ssid", "ID: ")->addParam("ssid", "Not Connected");
+
+	p1->createLine("time2", "time:")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);;
 
 	InfoPage* p2 = infos->createPage("P2", "P2");
 	InfoLine* el2 = p2->createLine("header2", "P2Test");
