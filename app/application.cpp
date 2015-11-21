@@ -46,7 +46,6 @@ void initInfoScreens() {
 	InfoLine* el = p1->createLine("header1", "P1Test");
 	//add the time param
 	el->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
-//	t->t.x = getXOnScreenForString(currentTime, 1);
 
 	InfoLine* el3 = p1->createLine("3", "ap: ");
 	el3->addParam("ap", "0.0.0.0");
@@ -56,7 +55,7 @@ void initInfoScreens() {
 
 	p1->createLine("ssid", "ID: ")->addParam("ssid", "Not Connected");
 
-	p1->createLine("time2", "time:")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);;
+	p1->createLine("time2", "time:")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 
 	InfoPage* p2 = infos->createPage("P2", "P2");
 	InfoLine* el2 = p2->createLine("header2", "P2Test");
