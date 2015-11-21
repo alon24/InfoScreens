@@ -3,6 +3,8 @@
 ## In progress
 This will be a sming library for esp8266, for showing multiple info screens with data on them, that refreshes automaticaly for you onscreen (currently ssd1306)
 
+Based on sming: https://github.com/SmingHub/Sming
+
 Pins used:
 
 Screen: </br>
