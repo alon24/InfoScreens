@@ -24,7 +24,7 @@ Extended_SSD1306 display(4);
 InfoScreens *infos;
 ```
 
-Adding Pages and other parts
+#### Adding Pages and other parts
 ```
   // Add a new Page
   InfoPage* p1 = infos->createPage("Main", "Main");
@@ -35,12 +35,12 @@ Adding Pages and other parts
   el->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 ```
 
-You can even add the same param more than 1 time in a page (short version now)
+#### You can even add the same param more than 1 time in a page (short version now)
 ```
   p1->createLine("time2", "time:")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 ```
 
-Add MORE Pages
+#### Add more Pages
 ```
   InfoPage* p2 = infos->createPage("P2", "P2");
 	InfoLine* el2 = p2->createLine("header2", "P2Test");
@@ -56,7 +56,7 @@ Add MORE Pages
 	p3->createLine("4", "ap:")->addParam("ap", "0.0.0.0");
 
 ```
-Now update a value:
+#### Now update a value:
 ```
   void handleUpdateTimer() {
   	currentTime = SystemClock.now().toShortTimeString(true);
@@ -64,7 +64,7 @@ Now update a value:
   }
 ```
 
-Move right (you can also move left) - show a different page
+#### Move right (you can also move left) - show a different page
 ```
 infos->moveRight();
 infos->moveLeft();
