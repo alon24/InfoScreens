@@ -1,4 +1,4 @@
-# Esp8266 InfoScreens
+# ESP8266 InfoScreens
 
 ## In progress
 This will be a sming library for esp8266, for showing multiple info screens with data on them, that refreshes automaticaly for you onscreen (currently ssd1306)
@@ -7,7 +7,7 @@ Based on sming: https://github.com/SmingHub/Sming
 
 ## Pins:
 
-Screen: </br>
+Screen (I2C): </br>
 sclPin 5</br>
 sdaPin 6
 
@@ -63,7 +63,7 @@ Now update a value:
   }
 ```
 
-Move right (you can also moveleft) - show a different page
+Move right (you can also move left) - show a different page
 ```
 infos->moveRight();
 infos->moveLeft();
