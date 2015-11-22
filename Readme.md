@@ -34,9 +34,11 @@ Adding Pages and other parts
   InfoLine* el = p1->createLine("header1", "P1Test");
   //add a time paramater (data that can be updated whenever)
   el->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
+```
 
-  //You can even add another time param to the same page (short version now)
-  p1->createLine("time2", "time:")->addParam("time", currentTime)->t.x =    getXOnScreenForString(currentTime, 1);
+You can even add the same param more than 1 time in a page (short version now)
+```
+  p1->createLine("time2", "time:")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 ```
 
 Add MORE Pages
