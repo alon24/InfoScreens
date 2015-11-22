@@ -1,10 +1,10 @@
 /*
- * Extended_SSD1306.cpp
+ * SSD1306_Driver.cpp
  *
  *  Created on: Aug 17, 2015
  *      Author: ilan
  */
-#include <Extended_SSD1306.h>
+#include <drivers/SSD1306_Driver.h>
 #include <SmingCore/SmingCore.h>
 
 //Timers
@@ -15,31 +15,31 @@ void doBlink() {
 }
 
 // initializer for I2C - we only indicate the reset pin!
-Extended_SSD1306::Extended_SSD1306(int8_t reset) :
+SSD1306_Driver::SSD1306_Driver(int8_t reset) :
 Adafruit_SSD1306(reset) {
 	textBlinkTimer.initializeMs(150, doBlink).start();
 }
 
-int16_t Extended_SSD1306::getCursorX() {
+int16_t SSD1306_Driver::getCursorX() {
 	return cursor_x;
 }
 
-int16_t Extended_SSD1306::getCursorY() {
+int16_t SSD1306_Driver::getCursorY() {
 	return cursor_y;
 }
 
-textRect* Extended_SSD1306::print(const String &s){
+textRect* SSD1306_Driver::print(const String &s){
 	textRect *t = new textRect();
 	t->x = cursor_x;
 	t->y = cursor_y;
 	t->h = 8;
 	Adafruit_SSD1306::print(s);
 	t->w = cursor_x - t->x;
-//	Serial.printf("Extended_SSD1306::print %s %s,%s\n", s.c_str(), String(t->x).c_str(), String(t->y).c_str()  );
+//	Serial.printf("SSD1306_Driver::print %s %s,%s\n", s.c_str(), String(t->x).c_str(), String(t->y).c_str()  );
 	return t;
 }
 
-void Extended_SSD1306::printToLoc(const String &s, textRect &t){
+void SSD1306_Driver::printToLoc(const String &s, textRect &t){
 	setCursor(t.x, t.y);
 //	uint32_t free = system_get_free_heap_size();
 //	int ff = (int)free;
@@ -56,18 +56,18 @@ void Extended_SSD1306::printToLoc(const String &s, textRect &t){
 //	Serial.printf(", 2= %i\n", ff );
 }
 
-void Extended_SSD1306::writeover(textRect &orig, const String &s) {
+void SSD1306_Driver::writeover(textRect &orig, const String &s) {
 	this->fillRect( orig.x, orig.y, orig.w, orig.h, BLACK);
 	this->printToLoc(s, orig);
 }
 
-textRect* Extended_SSD1306::getCurrentRect() {
+textRect* SSD1306_Driver::getCurrentRect() {
 	textRect *t = new textRect();
 	t->x = cursor_x;
 	t->y = cursor_y;
 }
 
-void Extended_SSD1306::blink(textRect loc, bool showMarker) {
+void SSD1306_Driver::blink(textRect loc, bool showMarker) {
 
 }
 

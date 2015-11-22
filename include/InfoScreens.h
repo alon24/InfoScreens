@@ -9,13 +9,15 @@
 #define INCLUDE_INFOSCREENS_H_
 
 #include <SmingCore/SmingCore.h>
-#include <Extended_SSD1306.h>
+#include <drivers/SSD1306_Driver.h>
 
 #define TIME_BETWEEN_SCREEN_CHANGE 300
 
-struct paramState {
+struct paramData {
 	bool dirty = false;
 	String val;
+	bool editable = false;
+	Vector<String*> values;
 
 	void update(String newVal) {
 		val = newVal;
@@ -25,11 +27,33 @@ struct paramState {
 	void clearDirty() {
 		dirty = false;
 	}
+
+	void initEditable(Vector<String*> newVals){
+		this->editable = true;
+		values.clear();
+		values.setSize(newVals.size());
+//		values = newVals;
+		for (int i=0; i<newVals.size(); ++i){
+			values.add(newVals.elementAt(i));
+		}
+	}
+
+	void setEditable(bool state) {
+		this->editable = state;
+	}
+
+	void setValues(Vector< String> newVals) {
+		this->values = values;
+	}
+
+	void addValue(String* data) {
+		this->values.add(data);
+	}
+
 };
 
 struct paramStruct{
 	textRect t;
-//	String text;
 	String id;
 
 	void init(String id, String text, textRect t) {
@@ -44,7 +68,7 @@ class BaseInfoElement
 protected:
 	String id;
 	BaseInfoElement* parent;
-	Extended_SSD1306* display;
+	SSD1306_Driver* display;
 
 public:
 
@@ -52,7 +76,7 @@ public:
 		this->id = id;
 	};
 
-	void setDisplay(Extended_SSD1306* disp) {
+	void setDisplay(SSD1306_Driver* disp) {
 		this->display = disp;
 	}
 
@@ -70,7 +94,7 @@ public:
 	virtual void setCanUpdateDisplay(bool newState) {};
 	virtual bool canUpdateDisplay() {};
 	virtual void updateParamValue(String id, String newData) {};
-	virtual paramState getParamText(String id){};
+	virtual paramData getParamText(String id){};
 };
 
 class InfoLine : public BaseInfoElement
@@ -90,24 +114,15 @@ public:
 
 	//prints the element
 	void print();
-//	void updateData(Extended_SSD1306 display, paramStruct* param, String newData);
-//	void updateData(Extended_SSD1306 display, int index, String newData);
-//	void updateDataForId(Extended_SSD1306 display, String id, String newData);
-
-//	paramStruct* getParam(int index);
 	paramStruct* getParamById(String id);
 
 	bool canUpdateDisplay(bool newState) {
 		return parent->canUpdateDisplay();
 	}
 
-	paramState getParamText(String id){
+	paramData getParamText(String id){
 		return parent->getParamText(id);
 	}
-
-//	void updateParamValue(String id, String value) {
-//		getParent()->getParent()->updateParamValue(id, value);
-//	}
 };
 
 class InfoPage : public BaseInfoElement{
@@ -153,24 +168,6 @@ public:
 		return NULL;
 	}
 
-//	//Does NOT call display.display();
-//	void updateParam( String id, String newVal, Extended_SSD1306 display) {
-//		Vector<InfoLine*> ret = getAllLinesParamsForId(id);
-//		for (int z = 0; z < ret.size(); ++z) {
-//			ret.elementAt(z)->updateDataForId(display, id, newVal);
-//		}
-//
-//		ret.removeAllElements();
-//	}
-//
-//	void updateAllParams( Vector<String> ids, Vector<String> newVals, Extended_SSD1306 display) {
-//		for (int i = 0; i < ids.size(); ++i) {
-//			updateParam(ids.elementAt(i), newVals.elementAt(i), display);
-//		}
-//
-//		display.display();
-//	}
-
 	Vector<paramStruct*> getAllParamsForId(String id) {
 		Vector<paramStruct*> ret;
 		for (int i = 0; i < mChildren.size(); ++i) {
@@ -204,11 +201,6 @@ public:
 	}
 
 	void print() {
-//		if(!canUpdateDisplay()) {
-//			Serial.println("Cannot Update display, flag is false");
-//			return;
-//		}
-//		debugf("print,3.1 ");
 		display->clearDisplay();
 //		debugf("print,3.2 ");
 		display->setCursor(0,0);
@@ -227,28 +219,57 @@ public:
 		return getParent()->canUpdateDisplay();
 	}
 
-	paramState getParamText(String id){
+	paramData getParamText(String id){
 		return parent->getParamText(id);
 	}
 };
 
 typedef Delegate<void()> showScreenUpdateDelegate;
+typedef Delegate<void()> btnUpdateDelegate;
+
+enum class BtnMode {
+	None = 0,
+	Click = 1,
+	DoubleClick = 2,
+	ClickAndRun = 3
+};
 
 class InfoScreens : public BaseInfoElement{
 
 private:
-//	int mCurrent=0;
 	Vector<InfoPage*> mChildern;
-//	Vector<paramStruct*> dirtyElements;
-	HashMap<String, paramState> paramValueMap;
+	HashMap<String, paramData> paramValueMap;
 
 	bool updateDisplay = false;
 	bool internalCanUpdateDisplay = true;
 	unsigned long lastUpdateTime = 0;
-//	Timer updateNextTimer;
 	Timer screenupdate;
 
+	int btnPin=0;
+	long lastClickTime = 0;
+	BtnMode btnMode = BtnMode::None;
+	int waitTimeForClick = 200;
+
 public:
+
+	InfoScreens(String id, SSD1306_Driver *dis, int btnPin) : BaseInfoElement(id)
+	{
+		this->display = dis;
+		setCurrent(0);
+
+		pinMode(btnPin, INPUT_PULLUP);
+		attachInterrupt(btnPin, showScreenUpdateDelegate(&InfoScreens::buttonPinHandler, this), CHANGE);
+
+		screenupdate.setCallback(showScreenUpdateDelegate(&InfoScreens::handleUpdateTimer, this));
+		screenupdate.setIntervalMs(80);
+		screenupdate.start(true);
+
+		display->print("InfoScreens");
+		Serial.print(display->getCursorY());
+		display->display();
+	}
+
+
 	void handleUpdateTimer() {
 //		debugf("can updatedisplay=%i", canUpdateDisplay());
 		if(canUpdateDisplay() && internalCanUpdateDisplay) {
@@ -297,24 +318,6 @@ public:
 		}
 	}
 
-//	InfoScreens(String id) : BaseInfoElement(id) {
-//
-//	}
-
-	InfoScreens(String id, Extended_SSD1306 *dis) : BaseInfoElement(id)
-	{
-		this->display = dis;
-		setCurrent(0);
-
-		screenupdate.setCallback(showScreenUpdateDelegate(&InfoScreens::handleUpdateTimer, this));
-		screenupdate.setIntervalMs(80);
-		screenupdate.start(true);
-
-		display->print("InfoScreens");
-		Serial.print(display->getCursorY());
-		display->display();
-	}
-
 	void setCurrent(int index) {
 //		if (index >= mChildern.size()) {
 //			return;
@@ -324,7 +327,7 @@ public:
 			paramValueMap["currentPage"].update(String(index));
 		}
 		else {
-			paramState p;
+			paramData p;
 			p.update(String(index));
 //			debugf("setCurrent - new param -cur= %i, %s",index, String(index).c_str());
 			paramValueMap["currentPage"] = p;
@@ -334,16 +337,7 @@ public:
 
 	void show() {
 		lastUpdateTime = millis();
-//		debugf("showCurrent,1");
-//		this->updateDisplay = true;
 		setCanUpdateDisplay(true);
-//		debugf("showCurrent,2");
-
-		//handle printing in timer
-//		print(paramValueMap["currentPage"S].val);
-
-
-//		debugf("showCurrent,3");
 	}
 
 	void show(int pNum) {
@@ -378,9 +372,6 @@ public:
 		}
 		debugf("moveRight mCurrent after=%i" , current);
 		paramValueMap["currentPage"].update(String(current));
-//		display->clearDisplay();
-//		display->setCursor(0,0);
-//		showCurrent();
 	}
 
 	void moveLeft() {
@@ -408,16 +399,7 @@ public:
 
 		debugf("moveLeft mCurrent after=%i" , current);
 		paramValueMap["currentPage"].update(String(current));
-
-//		this->display->clearDisplay();
-//		display->setCursor(0,0);
-//		showCurrent();
 	}
-
-//	//Do not print to screen anymore(so no updates to data)
-//	void hide(){
-//		this->updateDisplay = false;
-//	}
 
 	InfoPage* createPage(String id, String header){
 		InfoPage* el = new InfoPage(id, header);
@@ -445,7 +427,7 @@ public:
 		return mChildern.get(paramValueMap["currentPage"].val.toInt());
 	}
 
-	paramState getParamText(String id) {
+	paramData getParamText(String id) {
 		return paramValueMap[id];
 	}
 
@@ -456,17 +438,9 @@ public:
 //			paramValueMap.remove(id);
 		}
 
-		paramState p;
+		paramData p;
 		p.update(newData);
 		paramValueMap[id] = p;
-
-//		if (canUpdateDisplay()) {
-//			Vector<paramStruct*> params = getCurrent()->getAllParamsForId(id);
-//			for (int i = 0; i < params.size(); ++i) {
-//				paramStruct* param = params.get(i);
-//				display->writeover(param->t, newData);
-//			}
-//		}
 	}
 
 	void setCanUpdateDisplay(bool newState);
@@ -475,12 +449,6 @@ public:
 
 private:
 	void print(int pIndex) {
-//		if(!canUpdateDisplay()) {
-//			Serial.println("Cannot Update display, flag is false");
-//			return;
-//		}
-//		Serial.println("Printing index = " +String(pIndex));
-
 		internalCanUpdateDisplay = false;
 
 		InfoPage* p = get(pIndex);
@@ -488,17 +456,24 @@ private:
 		p->print();
 //		debugf("print, 4");
 
-//		resetAllParamsDirtyState(pIndex);
 		internalCanUpdateDisplay = true;
 	}
 
-	void resetAllParamsDirtyState(int pIndex) {
-		InfoPage* p = get(pIndex);
-		Vector<paramStruct*> pars = p->getAllParamsInPage();
-		debugf("resetAllParamsDirtyState, 1");
-		for(int i=0; i<pars.size(); i++) {
-			paramValueMap[pars.elementAt(i)->id].clearDirty();
-			debugf("resetAllParamsDirtyState, 2, %s", pars.elementAt(i)->id.c_str());
+	void buttonPinHandler() {
+		int btnState =  digitalRead(btnPin);
+		long current = millis();
+		if(btnState == 1) {
+			debugf( "pin %i, state is %i, elapsed=%d", btnPin, btnState, (current - lastClickTime ));
+
+			if(btnMode == BtnMode::None) {
+				btnMode = BtnMode::Click;
+			}
+//			else if(btnMode == ) {
+//
+//			}
+	//		infos->moveRight();
+			moveRight();
+			lastClickTime = current;
 		}
 	}
 

@@ -1,6 +1,6 @@
 #include <user_config.h>
 #include <SmingCore/SmingCore.h>
-#include <Extended_SSD1306.h>
+#include <drivers/SSD1306_driver.h>
 //#include <Libraries/Adafruit_SSD1306/Adafruit_SSD1306.h>
 #include <InfoScreens.h>
 #include <utils.h>
@@ -13,7 +13,7 @@
 #define sdaPin 4 //D1
 
 //* SSD1306 - I2C
-Extended_SSD1306 display(4);
+SSD1306_Driver display(4);
 //Adafruit_SSD1306 display(4);
 
 Timer procTimer;
@@ -31,14 +31,6 @@ void blink()
 {
 	digitalWrite(LED_PIN, state);
 	state = !state;
-}
-
-void buttonHandler() {
-	int btnState =  digitalRead(BTN_PIN);
-	debugf( "pin %i, state is %i", BTN_PIN, btnState);
-	if(btnState == 1) {
-		infos->moveRight();
-	}
 }
 
 void initInfoScreens() {
@@ -96,15 +88,12 @@ void init()
 //	display.print("Testing display");
 //	display.display();
 
-	infos = new InfoScreens("InfoScreens", &display);
+	infos = new InfoScreens("InfoScreens", &display, BTN_PIN);
 	initInfoScreens();
 	infos->show();
 
-	pinMode(BTN_PIN, INPUT_PULLUP);
-	attachInterrupt(BTN_PIN, buttonHandler, CHANGE);
-
-	pinMode(LED_PIN, OUTPUT);
-	procTimer.initializeMs(1000, blink).start();
+//	pinMode(LED_PIN, OUTPUT);
+//	procTimer.initializeMs(1000, blink).start();
 
 	updater.initializeMs(300, handleUpdateTimer).start();
 	updater2.initializeMs(120, handle2UpdateTimer).start();

@@ -68,7 +68,7 @@ void InfoLine::print()
 	{
 //		debugf("print,3.3.4 - %i", s);
 		paramStruct* param = params.get(s);
-		paramState str = getParamText(param->id);
+		paramData str = getParamText(param->id);
 
 		if (param->t.x != -1)
 		{
@@ -86,46 +86,6 @@ void InfoLine::print()
 //	debugf("print,3.3.7");
 //	Serial.printf("line end: %s, %s\n", String(t->x).c_str(), String(display.getCursorY()).c_str());
 }
-
-//void InfoLine::updateData(Extended_SSD1306 display, paramStruct* param,
-//		String newData)
-//{
-//	//		uint32_t free = system_get_free_heap_size();
-//	//		int ff = (int)free;
-//	//		Serial.printf("free1= %i", ff );
-//
-//	display.writeover(param->t, newData);
-//	//		free = system_get_free_heap_size();
-//	//		ff = (int)free;
-//	//		Serial.printf(", 2= %i", ff );
-//
-//	param->text = newData;
-//	//		free = system_get_free_heap_size();
-//	//		ff = (int)free;
-//	//		Serial.printf(", 3= %i\n", ff );
-//}
-
-//void InfoLine::updateData(Extended_SSD1306 display, int index,
-//		String newData)
-//{
-//	paramStruct* p = params.get(index);
-//	this->updateData(display, p, newData);
-//}
-//
-//void InfoLine::updateDataForId(Extended_SSD1306 display, String id,
-//		String newData)
-//{
-//	paramStruct* p = getParamById(id);
-//	if (p != NULL)
-//	{
-//		this->updateData(display, p, newData);
-//	}
-//}
-
-//paramStruct* InfoLine::getParam(int index)
-//{
-//	return params.get(index);
-//}
 
 paramStruct* InfoLine::getParamById(String id)
 {
