@@ -3,16 +3,15 @@
 ## In progress
 This will be a sming library for esp8266, for showing multiple info screens with data on them, that refreshes automaticaly for you onscreen (currently ssd1306)
 
-Based on sming: https://github.com/SmingHub/Sming
+#### Based on sming: https://github.com/SmingHub/Sming
 
-## Pins:
+### Pins:
 
 Screen (I2C): </br>
 sclPin 5</br>
 sdaPin 6
 
-push button switch 0:</br>
-relayPin 2
+Button 0
 
 ### Usage:
 
