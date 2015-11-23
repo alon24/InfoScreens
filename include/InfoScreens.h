@@ -263,7 +263,7 @@ public:
 //		pinMode(btnPin, INPUT_PULLUP);
 //		attachInterrupt(btnPin, showScreenUpdateDelegate(&InfoScreens::buttonPinHandler, this), CHANGE);
 		this->btnPin = btnPin;
-		btn = new ButtonActions(btnPin, btnUpdateDelegate(&InfoScreens::btnClicked, this));
+		btn = new ButtonActions(btnPin, ButtonActionDelegate(&InfoScreens::btnClicked, this));
 
 		screenupdate.setCallback(showScreenUpdateDelegate(&InfoScreens::handleUpdateTimer, this));
 		screenupdate.setIntervalMs(80);

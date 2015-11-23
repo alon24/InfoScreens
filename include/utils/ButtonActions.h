@@ -29,7 +29,7 @@ struct ButtonUseEvent {
 	const ButtonAction &action;
 };
 
-typedef Delegate<void(ButtonAction)> btnUpdateDelegate;
+typedef Delegate<void(ButtonAction)> ButtonActionDelegate;
 //typedef Delegate<void(String commandLine  ,CommandOutput* commandOutput)> commandFunctionDelegate;
 
 //typedef void (*cb_use)(ButtonUseEvent);
@@ -64,13 +64,28 @@ class ButtonActions
 	int m_buttonPin;
 	bool enablePressAndHold = true; //This will fire click events on button hold (so will not fire BTN_LONG_CLICK and BTN_HOLD_CLICK)
 public:
-	ButtonActions(int buttonPin, btnUpdateDelegate buttonUseDelegate)
+	ButtonActions(int buttonPin, ButtonActionDelegate handler)
 	{
 		m_buttonPin = buttonPin;
-//			cb_buttonUse = buttonUse;
-		this->buttonUseDelegate = buttonUseDelegate;
+		this->delegatedActionEvent = handler;
 		buttonTimer.initializeMs(80, TimerDelegate(&ButtonActions::actOnButton, this)).start();
 	};
+	
+	//simplified constructor
+	ButtonActions(int buttonPin)
+	{
+		m_buttonPin = buttonPin;
+		this->delegatedActionEvent = null;
+	};
+	
+	//Delegated call when event is triggered
+	void onButtonEvent(ButtonActionDelegate handler)
+	{
+		delegatedActionEvent  = handler;
+		if (!buttonTimer.isStarted()) {
+			buttonTimer.initializeMs(80, TimerDelegate(&ButtonActions::actOnButton, this)).start();
+		}
+	}
 
 	int checkButton()
 	{
@@ -126,7 +141,7 @@ public:
 			if (buttonVal == LOW && ((current - downTime) >= holdTime) && (current - pressAndHoldRepetGap)>= lastPressAndHoldTime)
 			{
 				lastPressAndHoldTime = current;
-				buttonUseDelegate(ButtonAction::BTN_CLICK);
+				delegatedActionEvent(ButtonAction::BTN_CLICK);
 			}
 		}
 		else {
@@ -165,24 +180,27 @@ public:
 		// Get button event and act accordingly
 		int b = checkButton();
 		ButtonAction act;
-		if (b == 1)
-			act = BTN_CLICK;
-		if (b == 2)
-			act = BTN_DOUBLE_CLICK;
-		if (b == 3)
-			act = BTN_LONG_CLICK;
-		if (b == 4)
-			act = BTN_HOLD_CLICK;
+		switch (b) {
+			case 1:
+				act = BTN_CLICK;
+				break;
+			case 2:
+				act = BTN_DOUBLE_CLICK;
+				break;
+			case 3:
+				act = BTN_LONG_CLICK;
+				break;
+			case 4:
+				act = BTN_HOLD_CLICK;
+				break;
+		}
 
-		if ((b==1 || b==2 || b==3 || b==4)) {
-//				ButtonUseEvent bue = { act };
-
-			buttonUseDelegate(act);
-//				cb_buttonUse(bue);
+		if ((b==1 || b==2 || b==3 || b==4) && delegatedActionEvent) {
+			delegatedActionEvent(act);
 		}
 	}
 private:
-	btnUpdateDelegate buttonUseDelegate;
+	ButtonActionDelegate delegatedActionEvent;
 	Timer buttonTimer;
 	TimerDelegate holdTimerDelegate;
 };
