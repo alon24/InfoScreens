@@ -10,6 +10,7 @@
 
 #include <SmingCore/SmingCore.h>
 #include <drivers/SSD1306_Driver.h>
+#include <utils/ButtonActions.h>
 
 #define TIME_BETWEEN_SCREEN_CHANGE 300
 
@@ -225,7 +226,7 @@ public:
 };
 
 typedef Delegate<void()> showScreenUpdateDelegate;
-typedef Delegate<void()> btnUpdateDelegate;
+//typedef Delegate<void()> btnUpdateDelegate;
 
 enum class BtnMode {
 	None = 0,
@@ -250,6 +251,8 @@ private:
 	BtnMode btnMode = BtnMode::None;
 	int waitTimeForClick = 200;
 
+	ButtonActions* btn;
+
 public:
 
 	InfoScreens(String id, SSD1306_Driver *dis, int btnPin) : BaseInfoElement(id)
@@ -257,8 +260,10 @@ public:
 		this->display = dis;
 		setCurrent(0);
 
-		pinMode(btnPin, INPUT_PULLUP);
-		attachInterrupt(btnPin, showScreenUpdateDelegate(&InfoScreens::buttonPinHandler, this), CHANGE);
+//		pinMode(btnPin, INPUT_PULLUP);
+//		attachInterrupt(btnPin, showScreenUpdateDelegate(&InfoScreens::buttonPinHandler, this), CHANGE);
+		this->btnPin = btnPin;
+		btn = new ButtonActions(btnPin, btnUpdateDelegate(&InfoScreens::btnClicked, this));
 
 		screenupdate.setCallback(showScreenUpdateDelegate(&InfoScreens::handleUpdateTimer, this));
 		screenupdate.setIntervalMs(80);
@@ -268,7 +273,6 @@ public:
 		Serial.print(display->getCursorY());
 		display->display();
 	}
-
 
 	void handleUpdateTimer() {
 //		debugf("can updatedisplay=%i", canUpdateDisplay());
@@ -477,6 +481,29 @@ private:
 		}
 	}
 
+	void btnClicked(ButtonAction event)
+	{
+		switch (event) {
+			case BTN_CLICK:
+				debugf("click");
+				moveRight();
+//				handleClick();
+				break;
+			case BTN_DOUBLE_CLICK:
+				debugf("BTN_DOUBLE_CLICK");
+				moveLeft();
+//				handleDoubleClick();
+				break;
+			case BTN_HOLD_CLICK:
+				debugf("BTN_HOLD_CLICK");
+//				handleLongClick();
+				break;
+			case BTN_LONG_CLICK:
+				debugf("BTN_LONG_CLICK");
+//				handleHoldClick();
+				break;
+		}
+	}
 };
 
 #endif /* INCLUDE_INFOSCREENS_H_ */

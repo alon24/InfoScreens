@@ -1,10 +1,9 @@
 #include <user_config.h>
 #include <SmingCore/SmingCore.h>
 #include <drivers/SSD1306_driver.h>
-//#include <Libraries/Adafruit_SSD1306/Adafruit_SSD1306.h>
+
 #include <InfoScreens.h>
 #include <utils.h>
-#include <Bounce/Bounce.h>
 
 #define LED_PIN 2 // GPIO2
 #define BTN_PIN 0
@@ -24,8 +23,6 @@ String currentTime = "00:00:00";
 
 Timer updater;
 Timer updater2;
-
-//Bounce bouncer = Bounce( BTN_PIN, 5 );
 
 void blink()
 {

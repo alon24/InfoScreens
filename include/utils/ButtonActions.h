@@ -26,19 +26,16 @@
 enum ButtonAction { BTN_CLICK=1, BTN_DOUBLE_CLICK=2, BTN_LONG_CLICK=3, BTN_HOLD_CLICK=4};
 
 struct ButtonUseEvent {
-//	const MenuItem &item;
 	const ButtonAction &action;
 };
 
-typedef void (*cb_use)(ButtonUseEvent);
+typedef Delegate<void(ButtonAction)> btnUpdateDelegate;
+//typedef Delegate<void(String commandLine  ,CommandOutput* commandOutput)> commandFunctionDelegate;
+
+//typedef void (*cb_use)(ButtonUseEvent);
 
 class ButtonActions
 {
-// LED variables
-		boolean clickVal = false;    // state of LED 1
-		boolean doubleClickVal = false;    // state of LED 2
-		boolean holdClickVal = false;    // state of LED 3
-		boolean longHoldClickVal = false;    // state of LED 4
 
 //=================================================
 //  MULTI-CLICK:  One Button, Multiple Events
@@ -62,11 +59,18 @@ class ButtonActions
 		boolean holdEventPast = false; // whether or not the hold event happened already
 		boolean longHoldEventPast = false; // whether or not the long hold event happened already
 		int m_buttonPin;
+		btnUpdateDelegate buttonUseDelegate;
+//		cb_use cb_buttonUse;
+
+		Timer buttonTimer;
+
 	public:
-		ButtonActions(int buttonPin, cb_use buttonUse)
+		ButtonActions(int buttonPin, btnUpdateDelegate buttonUseDelegate)
 		{
 			m_buttonPin = buttonPin;
-			cb_buttonUse = buttonUse;
+//			cb_buttonUse = buttonUse;
+			this->buttonUseDelegate = buttonUseDelegate;
+			buttonTimer.initializeMs(80, TimerDelegate(&ButtonActions::actOnButton, this)).start();
 		};
 
 		int checkButton()
@@ -158,13 +162,13 @@ class ButtonActions
 			if (b == 4)
 				act = BTN_HOLD_CLICK;
 
-			if ((b==1 || b==2 || b==3 || b==4) && cb_buttonUse) {
-				ButtonUseEvent bue = { act };
-				cb_buttonUse(bue);
+			if ((b==1 || b==2 || b==3 || b==4)) {
+//				ButtonUseEvent bue = { act };
+
+				buttonUseDelegate(act);
+//				cb_buttonUse(bue);
 			}
 		}
-
-		cb_use cb_buttonUse;
 	};
 
 #endif /* INCLUDE_ButtonActions_ */
