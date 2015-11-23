@@ -104,5 +104,4 @@ MultiFunctionButton(int buttonPin) </br>
 #### Set a new handler for click events
 void onButtonEvent(ButtonActionDelegate handler) </br>
 
-
-[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/rMo8-ImagDo/0.jpg)](https://www.youtube.com/watch?v=rMo8-ImagDo)
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/Kv1fsxQzNcM/0.jpg)](https://www.youtube.com/watch?v=Kv1fsxQzNcMo)
