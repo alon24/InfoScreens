@@ -441,10 +441,11 @@ public:
 			paramValueMap[id].update(newData);
 //			paramValueMap.remove(id);
 		}
-
-		paramData p;
-		p.update(newData);
-		paramValueMap[id] = p;
+		else {
+			paramData p;
+			p.update(newData);
+			paramValueMap[id] = p;
+		}
 	}
 
 	void setCanUpdateDisplay(bool newState);
