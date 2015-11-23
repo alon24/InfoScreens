@@ -295,7 +295,6 @@ public:
 //				debugf("params in page = %i", params.size());
 				boolean updated = false;
 
-
 				//need localcopy of params
 				Vector<String> tempIds;
 				for (int i = 0; i < params.size(); ++i) {
@@ -365,16 +364,16 @@ public:
 			return;
 		}
 		lastUpdateTime = tmpTime;
-		debugf("moveRight mills=%lu", lastUpdateTime);
+//		debugf("moveRight mills=%lu", lastUpdateTime);
 		int current = paramValueMap["currentPage"].val.toInt();
-		debugf("moveRight mCurrent=%i" , current);
+//		debugf("moveRight mCurrent=%i" , current);
 		if (current + 1 < mChildern.size()) {
 			current++;
 		}
 		else {
 			current = 0;
 		}
-		debugf("moveRight mCurrent after=%i" , current);
+//		debugf("moveRight mCurrent after=%i" , current);
 		paramValueMap["currentPage"].update(String(current));
 	}
 
@@ -383,7 +382,7 @@ public:
 			return;
 		}
 		int current = paramValueMap["currentPage"].val.toInt();
-		debugf("moveLeft mCurrent=%i" , current);
+//		debugf("moveLeft mCurrent=%i" , current);
 
 		int tmpTime = millis();
 		long mils = tmpTime - lastUpdateTime;
@@ -392,7 +391,7 @@ public:
 		}
 
 		lastUpdateTime = tmpTime;
-		debugf("moveLeft mills=%lu", lastUpdateTime);
+//		debugf("moveLeft mills=%lu", lastUpdateTime);
 
 		if (current - 1 >= 0) {
 			current--;
@@ -401,7 +400,7 @@ public:
 			current = mChildern.size()-1;
 		}
 
-		debugf("moveLeft mCurrent after=%i" , current);
+//		debugf("moveLeft mCurrent after=%i" , current);
 		paramValueMap["currentPage"].update(String(current));
 	}
 
