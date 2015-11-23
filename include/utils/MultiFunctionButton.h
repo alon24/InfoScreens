@@ -23,6 +23,9 @@
  4) Long Press and Hold:  holding the button for a long time
  */
 
+/*
+ * Now added options to Hold and get click repeats (100ms)
+ */
 enum MultiFunctionButtonAction { BTN_CLICK=1, BTN_DOUBLE_CLICK=2, BTN_LONG_CLICK=3, BTN_HOLD_CLICK=4, BTN_HOLD_RUNEVENTS};
 
 typedef Delegate<void(MultiFunctionButtonAction)> ButtonActionDelegate;
@@ -118,7 +121,9 @@ public:
 			if (buttonVal == LOW && ((current - downTime) >= holdTime) && (current - pressAndHoldRepetGap)>= lastPressAndHoldTime)
 			{
 				lastPressAndHoldTime = current;
-				delegatedActionEvent(MultiFunctionButtonAction::BTN_CLICK);
+				if (delegatedActionEvent) {
+					delegatedActionEvent(MultiFunctionButtonAction::BTN_CLICK);
+				}
 			}
 		}
 		else {
