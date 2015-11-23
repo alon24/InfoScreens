@@ -10,7 +10,7 @@
 
 #include <SmingCore/SmingCore.h>
 #include <drivers/SSD1306_Driver.h>
-#include <utils/ButtonActions.h>
+#include "utils/MultiFunctionButton.h"
 
 #define TIME_BETWEEN_SCREEN_CHANGE 300
 
@@ -251,7 +251,7 @@ private:
 	BtnMode btnMode = BtnMode::None;
 	int waitTimeForClick = 200;
 
-	ButtonActions* btn;
+	MultiFunctionButton* btn;
 
 public:
 
@@ -263,7 +263,7 @@ public:
 //		pinMode(btnPin, INPUT_PULLUP);
 //		attachInterrupt(btnPin, showScreenUpdateDelegate(&InfoScreens::buttonPinHandler, this), CHANGE);
 		this->btnPin = btnPin;
-		btn = new ButtonActions(btnPin, ButtonActionDelegate(&InfoScreens::btnClicked, this));
+		btn = new MultiFunctionButton(btnPin, ButtonActionDelegate(&InfoScreens::btnClicked, this));
 
 		screenupdate.setCallback(showScreenUpdateDelegate(&InfoScreens::handleUpdateTimer, this));
 		screenupdate.setIntervalMs(80);
@@ -482,7 +482,7 @@ private:
 		}
 	}
 
-	void btnClicked(ButtonAction event)
+	void btnClicked(MultiFunctionButtonAction event)
 	{
 		switch (event) {
 			case BTN_CLICK:

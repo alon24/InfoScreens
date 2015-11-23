@@ -23,18 +23,11 @@
  4) Long Press and Hold:  holding the button for a long time
  */
 
-enum ButtonAction { BTN_CLICK=1, BTN_DOUBLE_CLICK=2, BTN_LONG_CLICK=3, BTN_HOLD_CLICK=4, BTN_HOLD_RUNEVENTS};
+enum MultiFunctionButtonAction { BTN_CLICK=1, BTN_DOUBLE_CLICK=2, BTN_LONG_CLICK=3, BTN_HOLD_CLICK=4, BTN_HOLD_RUNEVENTS};
 
-struct ButtonUseEvent {
-	const ButtonAction &action;
-};
+typedef Delegate<void(MultiFunctionButtonAction)> ButtonActionDelegate;
 
-typedef Delegate<void(ButtonAction)> ButtonActionDelegate;
-//typedef Delegate<void(String commandLine  ,CommandOutput* commandOutput)> commandFunctionDelegate;
-
-//typedef void (*cb_use)(ButtonUseEvent);
-
-class ButtonActions
+class MultiFunctionButton
 {
 
 //=================================================
@@ -45,34 +38,18 @@ class ButtonActions
 	int DCgap = 250;       // max ms between clicks for a double click event
 	int holdTime = 400; // ms hold period: how long to wait for press+hold event
 	int longHoldTime = 3000; // ms long hold period: how long to wait for press+hold event
-
-// Button variables
-	boolean buttonVal = HIGH;   // value read from button
-	boolean buttonLast = HIGH; // buffered value of the button's previous state
-	boolean DCwaiting = false; // whether we're waiting for a double click (down)
-	boolean DConUp = false; // whether to register a double click on next release, or whether to wait and click
-	boolean singleOK = true;    // whether it's OK to do a single click
-	long downTime = -1;         // time the button was pressed down
-	long upTime = -1;           // time the button was released
-	long lastPressAndHoldTime = -1; // time the pressAndHold was activated last
 	long pressAndHoldRepetGap = 100;
-
-	boolean ignoreUp = false; // whether to ignore the button release because the click+hold was triggered
-	boolean waitForUp = false; // when held, whether to wait for the up event
-	boolean holdEventPast = false; // whether or not the hold event happened already
-	boolean longHoldEventPast = false; // whether or not the long hold event happened already
-	int m_buttonPin;
 	bool enablePressAndHold = true; //This will fire click events on button hold (so will not fire BTN_LONG_CLICK and BTN_HOLD_CLICK)
 public:
-	ButtonActions(int buttonPin, ButtonActionDelegate handler)
+	MultiFunctionButton(int buttonPin, ButtonActionDelegate handler)
 	{
 		m_buttonPin = buttonPin;
 		this->delegatedActionEvent = handler;
-		buttonTimer.initializeMs(80, TimerDelegate(&ButtonActions::actOnButton, this)).start();
+		buttonTimer.initializeMs(80, TimerDelegate(&MultiFunctionButton::actOnButton, this)).start();
 	};
 	
 	//simplified constructor
-	ButtonActions(int buttonPin)
+	MultiFunctionButton(int buttonPin)
 	{
 		m_buttonPin = buttonPin;
 		this->delegatedActionEvent = null;
@@ -83,7 +60,7 @@ public:
 	{
 		delegatedActionEvent  = handler;
 		if (!buttonTimer.isStarted()) {
-			buttonTimer.initializeMs(80, TimerDelegate(&ButtonActions::actOnButton, this)).start();
+			buttonTimer.initializeMs(80, TimerDelegate(&MultiFunctionButton::actOnButton, this)).start();
 		}
 	}
 
@@ -141,7 +118,7 @@ public:
 			if (buttonVal == LOW && ((current - downTime) >= holdTime) && (current - pressAndHoldRepetGap)>= lastPressAndHoldTime)
 			{
 				lastPressAndHoldTime = current;
-				delegatedActionEvent(ButtonAction::BTN_CLICK);
+				delegatedActionEvent(MultiFunctionButtonAction::BTN_CLICK);
 			}
 		}
 		else {
@@ -179,7 +156,7 @@ public:
 	{
 		// Get button event and act accordingly
 		int b = checkButton();
-		ButtonAction act;
+		MultiFunctionButtonAction act;
 		switch (b) {
 			case 1:
 				act = BTN_CLICK;
@@ -203,6 +180,21 @@ private:
 	ButtonActionDelegate delegatedActionEvent;
 	Timer buttonTimer;
 	TimerDelegate holdTimerDelegate;
+	long downTime = -1;         // time the button was pressed down
+	long upTime = -1;           // time the button was released
+	long lastPressAndHoldTime = -1; // time the pressAndHold was activated last
+	int m_buttonPin;
+
+	// Button variables
+	boolean buttonVal = HIGH;   // value read from button
+	boolean buttonLast = HIGH; // buffered value of the button's previous state
+	boolean DCwaiting = false; // whether we're waiting for a double click (down)
+	boolean DConUp = false; // whether to register a double click on next release, or whether to wait and click
+	boolean singleOK = true;    // whether it's OK to do a single click
+	boolean ignoreUp = false; // whether to ignore the button release because the click+hold was triggered
+	boolean waitForUp = false; // when held, whether to wait for the up event
+	boolean holdEventPast = false; // whether or not the hold event happened already
+	boolean longHoldEventPast = false; // whether or not the long hold event happened already
 };
 
 #endif /* INCLUDE_ButtonActions_ */
