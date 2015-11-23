@@ -9,9 +9,7 @@
 #define INCLUDE_MENUES_H_
 
 #include <SmingCore/SmingCore.h>
-//#include <Libraries/Adafruit_SSD1306/Adafruit_SSD1306.h>
-#include <Extended_SSD1306.h>
-//#include <utils.h>
+#include <drivers/SSD1306_driver.h>
 
 enum MenuActionEnum
 {
