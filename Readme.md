@@ -56,6 +56,12 @@ InfoScreens *infos;
 	p3->createLine("4", "ap:")->addParam("ap", "0.0.0.0");
 
 ```
+
+### Show the menu
+```
+infos->show();
+```
+
 #### Now update a value:
 ```
   void handleUpdateTimer() {
@@ -69,5 +75,34 @@ InfoScreens *infos;
 infos->moveRight();
 infos->moveLeft();
 ```
+
+### Use of InfoScreen
+Click - move to next Screen
+DoubleClick - move to previous Screen
+Click and hold - Rapid fore (100ms) of move to next screen
+
+#### MultiFunctionButton
+This button implementation can sense:
+
+1. **Click**
+2. **Double Click**
+
+If **enablePressAndHold = true** then if button is still pressed after click, it will send a
+click event every 100ms
+
+if **enablePressAndHold = false** then lib will detect:
+3. **Long click** - no Click events fired
+4. **Hold click** - no Click events fired
+
+### Usage:
+#### Regular Constrcutor
+MultiFunctionButton(int buttonPin, ButtonActionDelegate handler) </br>
+
+#### Simplified Constrcutor</br>
+MultiFunctionButton(int buttonPin) </br>
+
+#### Set a new handler for click events
+void onButtonEvent(ButtonActionDelegate handler) </br>
+
 
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/rMo8-ImagDo/0.jpg)](https://www.youtube.com/watch?v=rMo8-ImagDo)
