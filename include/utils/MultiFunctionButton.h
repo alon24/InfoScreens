@@ -43,31 +43,35 @@ class MultiFunctionButton
 	int DCgap = 250;       // max ms between clicks for a double click event
 	int holdTime = 400; // ms hold period: how long to wait for press+hold event
 	int longHoldTime = 3000; // ms long hold period: how long to wait for press+hold event
-	long pressAndHoldRepetGap = 100;
-	bool enablePressAndHold = true; //This will fire click events on button hold (so will not fire BTN_LONG_CLICK and BTN_HOLD_CLICK)
+	long pressAndHoldRepeatGap = 100;
+
 public:
 
-	MultiFunctionButton() {
-	};
+	MultiFunctionButton() {};
 
-	MultiFunctionButton(int buttonPin, ButtonActionDelegate handler = null)
+	MultiFunctionButton(int buttonPin, ButtonActionDelegate handler = null, bool pressAndHold = true)
 	{
 		m_buttonPin = buttonPin;
 		this->delegatedActionEvent = handler;
 		if (handler) {
 			buttonTimer.initializeMs(80, TimerDelegate(&MultiFunctionButton::actOnButton, this)).start();
 		}
+
+		enablePressAndHold(pressAndHold);
 	};
-//
-//	//simplified constructor
-//	MultiFunctionButton(int buttonPin) : MultiFunctionButton( buttonPin, null) {};
 
 	// init to set button, handler is optional here
-	void initBtn(int buttonPin, ButtonActionDelegate handler = null) {
+	void initBtn(int buttonPin, ButtonActionDelegate handler = null, bool pressAndHold = true) {
 		m_buttonPin = buttonPin;
 		if (handler) {
 			setOnButtonEvent(handler);
 		}
+
+		enablePressAndHold(pressAndHold);
+	}
+
+	void enablePressAndHold(bool pressAndHold) {
+		this->pressAndHold = pressAndHold;
 	}
 
 	//Delegated call when event is triggered
@@ -127,10 +131,10 @@ public:
 			DCwaiting = false;
 		}
 
-		if (enablePressAndHold) {
+		if (pressAndHold) {
 			// Test for hold
 			long current = millis();
-			if (buttonVal == LOW && ((current - downTime) >= holdTime) && (current - pressAndHoldRepetGap)>= lastPressAndHoldTime)
+			if (buttonVal == LOW && ((current - downTime) >= holdTime) && (current - pressAndHoldRepeatGap)>= lastPressAndHoldTime)
 			{
 				lastPressAndHoldTime = current;
 				if (delegatedActionEvent) {
@@ -212,6 +216,8 @@ private:
 	boolean waitForUp = false; // when held, whether to wait for the up event
 	boolean holdEventPast = false; // whether or not the hold event happened already
 	boolean longHoldEventPast = false; // whether or not the long hold event happened already
+
+	bool pressAndHold = true; //This will fire click events on button hold (so will not fire BTN_LONG_CLICK and BTN_HOLD_CLICK)
 };
 
 #endif /* INCLUDE_ButtonActions_ */
