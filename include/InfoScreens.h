@@ -14,11 +14,17 @@
 
 #define TIME_BETWEEN_SCREEN_CHANGE 300
 
+enum class ParamaterActionType {
+	Static = 0,
+	Dynamic = 1
+};
+
 struct paramData {
 	bool dirty = false;
 	String val;
 	bool editable = false;
 	Vector<String*> values;
+	ParamaterActionType type = ParamaterActionType::Static;
 
 	void update(String newVal) {
 		val = newVal;
@@ -57,9 +63,13 @@ struct paramStruct{
 	textRect t;
 	String id;
 
-	void init(String id, String text, textRect t) {
+	//need to be able to set for each instance or param!!!
+	boolean editable = false;
+
+	void init(String id, String text, textRect t, bool edit=false) {
 		this->id = id;
 		this->t = t;
+		this->editable = edit;
 	}
 };
 
@@ -196,6 +206,11 @@ public:
 		return ret;
 	}
 
+	/**
+	 * check if there are params on page which are editable
+	 */
+	bool checkEditModeAvailble();
+
 	//No screen update
 	void updateParamValue(String id, String newData) {
 		getParent()->updateParamValue(id, newData);
@@ -235,6 +250,11 @@ enum class BtnMode {
 	ClickAndRun = 3
 };
 
+enum class ViewMode {
+	INFO = 0,
+	EDIT = 1
+};
+
 class InfoScreens : public BaseInfoElement{
 
 private:
@@ -250,8 +270,8 @@ private:
 	long lastClickTime = 0;
 	BtnMode btnMode = BtnMode::None;
 	int waitTimeForClick = 200;
-
-	MultiFunctionButton* btn;
+	MultiFunctionButton btn;
+	ViewMode viewMode = ViewMode::INFO;
 
 public:
 
@@ -260,10 +280,9 @@ public:
 		this->display = dis;
 		setCurrent(0);
 
-//		pinMode(btnPin, INPUT_PULLUP);
-//		attachInterrupt(btnPin, showScreenUpdateDelegate(&InfoScreens::buttonPinHandler, this), CHANGE);
 		this->btnPin = btnPin;
-		btn = new MultiFunctionButton(btnPin, ButtonActionDelegate(&InfoScreens::btnClicked, this));
+		btn.initBtn(btnPin);
+		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 
 		screenupdate.setCallback(showScreenUpdateDelegate(&InfoScreens::handleUpdateTimer, this));
 		screenupdate.setIntervalMs(80);
@@ -347,10 +366,6 @@ public:
 		setCurrent(pNum);
 //		debugf("show:%i", pNum);
 		show();
-	}
-
-	void doMove(boolean ) {
-
 	}
 
 	void moveRight() {
@@ -451,6 +466,9 @@ public:
 	bool canUpdateDisplay();
 	int count();
 
+	void changeViewMode(ViewMode mode);
+	bool checkEditModeAvailble();
+
 private:
 	void print(int pIndex) {
 		internalCanUpdateDisplay = false;
@@ -463,47 +481,8 @@ private:
 		internalCanUpdateDisplay = true;
 	}
 
-	void buttonPinHandler() {
-		int btnState =  digitalRead(btnPin);
-		long current = millis();
-		if(btnState == 1) {
-			debugf( "pin %i, state is %i, elapsed=%d", btnPin, btnState, (current - lastClickTime ));
-
-			if(btnMode == BtnMode::None) {
-				btnMode = BtnMode::Click;
-			}
-//			else if(btnMode == ) {
-//
-//			}
-	//		infos->moveRight();
-			moveRight();
-			lastClickTime = current;
-		}
-	}
-
-	void btnClicked(MultiFunctionButtonAction event)
-	{
-		switch (event) {
-			case BTN_CLICK:
-				debugf("click");
-				moveRight();
-//				handleClick();
-				break;
-			case BTN_DOUBLE_CLICK:
-				debugf("BTN_DOUBLE_CLICK");
-				moveLeft();
-//				handleDoubleClick();
-				break;
-			case BTN_HOLD_CLICK:
-				debugf("BTN_HOLD_CLICK");
-//				handleLongClick();
-				break;
-			case BTN_LONG_CLICK:
-				debugf("BTN_LONG_CLICK");
-//				handleHoldClick();
-				break;
-		}
-	}
+	void infoModeBtnClicked(MultiFunctionButtonAction event);
+	void editModeBtnClicked(MultiFunctionButtonAction event);
 };
 
 #endif /* INCLUDE_INFOSCREENS_H_ */

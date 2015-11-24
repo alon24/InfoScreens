@@ -24,9 +24,11 @@
  */
 
 /*
- * Now added options to Hold and get click repeats (100ms)
+ * alon24
+ *
+ *  added options to Hold and get click repeats (100ms)
  */
-enum MultiFunctionButtonAction { BTN_CLICK=1, BTN_DOUBLE_CLICK=2, BTN_LONG_CLICK=3, BTN_HOLD_CLICK=4, BTN_HOLD_RUNEVENTS};
+enum MultiFunctionButtonAction { BTN_CLICK=1, BTN_DOUBLE_CLICK=2, BTN_LONG_CLICK=3, BTN_HOLD_CLICK=4};
 
 typedef Delegate<void(MultiFunctionButtonAction)> ButtonActionDelegate;
 
@@ -44,22 +46,32 @@ class MultiFunctionButton
 	long pressAndHoldRepetGap = 100;
 	bool enablePressAndHold = true; //This will fire click events on button hold (so will not fire BTN_LONG_CLICK and BTN_HOLD_CLICK)
 public:
-	MultiFunctionButton(int buttonPin, ButtonActionDelegate handler)
+
+	MultiFunctionButton() {
+	};
+
+	MultiFunctionButton(int buttonPin, ButtonActionDelegate handler = null)
 	{
 		m_buttonPin = buttonPin;
 		this->delegatedActionEvent = handler;
-		buttonTimer.initializeMs(80, TimerDelegate(&MultiFunctionButton::actOnButton, this)).start();
+		if (handler) {
+			buttonTimer.initializeMs(80, TimerDelegate(&MultiFunctionButton::actOnButton, this)).start();
+		}
 	};
-	
-	//simplified constructor
-	MultiFunctionButton(int buttonPin)
-	{
+//
+//	//simplified constructor
+//	MultiFunctionButton(int buttonPin) : MultiFunctionButton( buttonPin, null) {};
+
+	// init to set button, handler is optional here
+	void initBtn(int buttonPin, ButtonActionDelegate handler = null) {
 		m_buttonPin = buttonPin;
-		this->delegatedActionEvent = null;
-	};
-	
+		if (handler) {
+			setOnButtonEvent(handler);
+		}
+	}
+
 	//Delegated call when event is triggered
-	void onButtonEvent(ButtonActionDelegate handler)
+	void setOnButtonEvent(ButtonActionDelegate handler)
 	{
 		delegatedActionEvent  = handler;
 		if (!buttonTimer.isStarted()) {
@@ -188,7 +200,7 @@ private:
 	long downTime = -1;         // time the button was pressed down
 	long upTime = -1;           // time the button was released
 	long lastPressAndHoldTime = -1; // time the pressAndHold was activated last
-	int m_buttonPin;
+	int m_buttonPin =-1;
 
 	// Button variables
 	boolean buttonVal = HIGH;   // value read from button

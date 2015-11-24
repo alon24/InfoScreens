@@ -99,6 +99,16 @@ paramStruct* InfoLine::getParamById(String id)
 	return NULL;
 }
 
+bool InfoPage::checkEditModeAvailble(){
+	Vector<paramStruct*> params = getAllParamsInPage();
+	for (int i = 0; i < params.size(); ++i) {
+		if (params.elementAt(i)->editable) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void InfoScreens::setCanUpdateDisplay(bool newState){
 		this->updateDisplay = newState;
 	}
@@ -109,4 +119,69 @@ bool InfoScreens::canUpdateDisplay(){
 
 int InfoScreens::count() {
 	return mChildern.size();
+}
+
+void InfoScreens::infoModeBtnClicked(MultiFunctionButtonAction event)
+{
+	switch (event) {
+		case BTN_CLICK:
+			debugf("click");
+			moveRight();
+	//				handleClick();
+			break;
+		case BTN_DOUBLE_CLICK:
+			debugf("BTN_DOUBLE_CLICK");
+			moveLeft();
+	//				handleDoubleClick();
+			break;
+		case BTN_HOLD_CLICK:
+			debugf("BTN_HOLD_CLICK");
+	//				handleLongClick();
+			break;
+		case BTN_LONG_CLICK:
+			debugf("BTN_LONG_CLICK");
+	//				handleHoldClick();
+			break;
+	}
+}
+
+void InfoScreens::editModeBtnClicked(MultiFunctionButtonAction event)
+{
+	switch (event) {
+		case BTN_CLICK:
+			debugf("click");
+			moveRight();
+//				handleClick();
+			break;
+		case BTN_DOUBLE_CLICK:
+			debugf("BTN_DOUBLE_CLICK");
+			moveLeft();
+//				handleDoubleClick();
+			break;
+		case BTN_HOLD_CLICK:
+			debugf("BTN_HOLD_CLICK");
+//				handleLongClick();
+			break;
+		case BTN_LONG_CLICK:
+			debugf("BTN_LONG_CLICK");
+//				handleHoldClick();
+			break;
+	}
+}
+
+void InfoScreens::changeViewMode(ViewMode mode) {
+	if (viewMode == mode) {
+		return;
+	}
+
+	this->viewMode = mode;
+	if(mode == ViewMode::INFO) {
+		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+	} else {
+		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
+	}
+}
+
+bool InfoScreens::checkEditModeAvailble() {
+	return getCurrent()->checkEditModeAvailble();
 }

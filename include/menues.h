@@ -72,11 +72,6 @@ public:
 	}
 	;
 
-//	MenuItem(String name, MenuActionEnum act) :
-//			MenuItem(name, Type::Item)
-//	{
-//		m_actionEnum = act;
-//	}
 
 	void setDelegate() {
 
@@ -92,13 +87,6 @@ public:
 	{
 		return m_linkerItem;
 	}
-
-	// bool operator ==(MenuItem& item1)
-	// {
-	// 	return (getId() == item1.getId());
-	// }
-	// bool operator != ( MenuItem& item1);
-
 };
 
 class MenuPage: public BaseMenuElement
