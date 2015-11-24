@@ -227,11 +227,6 @@ public:
 //			debugf("print,3.4 - %i ", i);
 		}
 //		debugf("print,3.6 ");
-
-		//TODO:ilan check if needed display here
-//		display->display();
-
-//		debugf("print,3.7 ");
 	}
 
 	bool canUpdateDisplay() {
@@ -274,9 +269,9 @@ private:
 	BtnMode btnMode = BtnMode::None;
 	int waitTimeForClick = 200;
 	MultiFunctionButton btn;
-	ViewMode viewMode = ViewMode::INFO;
+	ViewMode viewMode = ViewMode::EDIT;
 	long lastEditModeBlinkTime = -1;
-	long editModeBlinkTime = 200;
+	long editModeBlinkTime = 800;
 	bool blinkDrawn = false;
 public:
 
@@ -295,9 +290,6 @@ public:
 
 		display->print("InfoScreens");
 		Serial.print(display->getCursorY());
-
-		//TODO:ilan check if need display here
-//		display->display();
 	}
 
 	void handleUpdateTimer();

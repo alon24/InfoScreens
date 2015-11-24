@@ -119,14 +119,6 @@ void InfoScreens::handleUpdateTimer() {
 			return;
 		}
 
-		long current = millis();
-		//in case of edit mode, flip every x mills the line (blink)
-		if(viewMode == ViewMode::EDIT && current >= (lastEditModeBlinkTime + editModeBlinkTime)) {
-			lastEditModeBlinkTime = current;
-			blinkDrawn = !blinkDrawn;
-			display->drawRect(0,0, 120, 100, blinkDrawn ? WHITE : BLACK);
-		}
-
 		if (paramValueMap["currentPage"].dirty) {
 //				debugf("currentPage = %i, paramValueMap['currentPage'].dirty= %d",paramValueMap["currentPage"].val.toInt(), (int)paramValueMap["currentPage"].dirty);
 			display->clearDisplay();
@@ -161,6 +153,17 @@ void InfoScreens::handleUpdateTimer() {
 			internalCanUpdateDisplay = true;
 			if (updated) {
 				display->display();
+			}
+
+			long current = millis();
+			//in case of edit mode, flip every x mills the line (blink)
+			if(viewMode == ViewMode::EDIT && current >= (lastEditModeBlinkTime + editModeBlinkTime)) {
+				lastEditModeBlinkTime = current;
+				blinkDrawn = !blinkDrawn;
+	//			display->drawRect(0,0, 128, 64, blinkDrawn ? WHITE : BLACK);
+//				display->drawPixel(127,0 , blinkDrawn ? WHITE : BLACK);
+				display->fillRect(126, 0, 128, 2, blinkDrawn ? WHITE : BLACK);
+//				display->display();
 			}
 		}
 	}
