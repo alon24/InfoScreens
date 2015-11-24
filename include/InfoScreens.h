@@ -12,7 +12,11 @@
 #include <drivers/SSD1306_Driver.h>
 #include "utils/MultiFunctionButton.h"
 
-#define TIME_BETWEEN_SCREEN_CHANGE 300
+
+
+
+
+//#define TIME_BETWEEN_SCREEN_CHANGE 300
 
 enum class ParamaterActionType {
 	Static = 0,
@@ -261,7 +265,7 @@ private:
 
 	bool updateDisplay = false;
 	bool internalCanUpdateDisplay = true;
-	unsigned long lastUpdateTime = 0;
+//	unsigned long lastUpdateTime = 0;
 	Timer screenupdate;
 
 	int btnPin=0;
@@ -312,7 +316,7 @@ public:
 	}
 
 	void show() {
-		lastUpdateTime = millis();
+//		lastUpdateTime = millis();
 		setCanUpdateDisplay(true);
 	}
 
@@ -323,18 +327,14 @@ public:
 	}
 
 	void moveRight() {
+//		debugf("start mem %d",system_get_free_heap_size());
 		if (mChildern.size() == 1) {
 			return;
 		}
 
-		int tmpTime = millis();
-		long mils = tmpTime - lastUpdateTime;
-		if (mils < TIME_BETWEEN_SCREEN_CHANGE) {
-			return;
-		}
-		lastUpdateTime = tmpTime;
-//		debugf("moveRight mills=%lu", lastUpdateTime);
+////		debugf("moveRight mills=%lu", lastUpdateTime);
 		int current = paramValueMap["currentPage"].val.toInt();
+
 //		debugf("moveRight mCurrent=%i" , current);
 		if (current + 1 < mChildern.size()) {
 			current++;
@@ -344,6 +344,7 @@ public:
 		}
 //		debugf("moveRight mCurrent after=%i" , current);
 		paramValueMap["currentPage"].update(String(current));
+//		debugf("end mem %d",system_get_free_heap_size());
 	}
 
 	void moveLeft() {
@@ -352,15 +353,6 @@ public:
 		}
 		int current = paramValueMap["currentPage"].val.toInt();
 //		debugf("moveLeft mCurrent=%i" , current);
-
-		int tmpTime = millis();
-		long mils = tmpTime - lastUpdateTime;
-		if (mils < TIME_BETWEEN_SCREEN_CHANGE) {
-			return;
-		}
-
-		lastUpdateTime = tmpTime;
-//		debugf("moveLeft mills=%lu", lastUpdateTime);
 
 		if (current - 1 >= 0) {
 			current--;

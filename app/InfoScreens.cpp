@@ -59,11 +59,14 @@ paramStruct* InfoLine::addParam(String id, String text, textRect initial)
 //prints the element
 void InfoLine::print()
 {
+//	debugf("start mem %d",system_get_free_heap_size());
 //	debugf("print,3.3.1 %s, %i", getText().c_str(), this->display->getCursorX());
-	textRect *t = this->display->print(getText());
+	textRect *t1 = this->display->print(getText());
+	delete(t1);
 //	debugf("print,3.3.2");
 	int y = this->display->getCursorY();
 //	debugf("print,3.3.3");
+
 	for (int s = 0; s < params.size(); ++s)
 	{
 //		debugf("print,3.3.4 - %i", s);
@@ -78,11 +81,17 @@ void InfoLine::print()
 		}
 		textRect* t = this->display->print(str.val);
 		str.clearDirty();
-		param->t = *t;
+		param->t.x = t->x;
+		param->t.y = t->y;
+		param->t.h = t->h;
+		param->t.w = t->w;
+//		param->t = *t;
+		delete(t);
 //		Serial.printf("x %i, y %i, w %i\n", t->x, t->y, t->w);
 	}
 //	debugf("print,3.3.6");
 	this->display->println();
+//	debugf("end mem %d",system_get_free_heap_size());
 //	debugf("print,3.3.7");
 //	Serial.printf("line end: %s, %s\n", String(t->x).c_str(), String(display.getCursorY()).c_str());
 }
