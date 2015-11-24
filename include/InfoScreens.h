@@ -227,7 +227,10 @@ public:
 //			debugf("print,3.4 - %i ", i);
 		}
 //		debugf("print,3.6 ");
-		display->display();
+
+		//TODO:ilan check if needed display here
+//		display->display();
+
 //		debugf("print,3.7 ");
 	}
 
@@ -272,7 +275,9 @@ private:
 	int waitTimeForClick = 200;
 	MultiFunctionButton btn;
 	ViewMode viewMode = ViewMode::INFO;
-
+	long lastEditModeBlinkTime = -1;
+	long editModeBlinkTime = 200;
+	bool blinkDrawn = false;
 public:
 
 	InfoScreens(String id, SSD1306_Driver *dis, int btnPin) : BaseInfoElement(id)
@@ -290,55 +295,12 @@ public:
 
 		display->print("InfoScreens");
 		Serial.print(display->getCursorY());
-		display->display();
+
+		//TODO:ilan check if need display here
+//		display->display();
 	}
 
-	void handleUpdateTimer() {
-//		debugf("can updatedisplay=%i", canUpdateDisplay());
-		if(canUpdateDisplay() && internalCanUpdateDisplay) {
-			if (mChildern.size() == 0) {
-				debugf("I cannot print anything, no Pages declared, setting to NOT update display");
-				setCanUpdateDisplay(false);
-				return;
-			}
-			if (paramValueMap["currentPage"].dirty) {
-//				debugf("currentPage = %i, paramValueMap['currentPage'].dirty= %d",paramValueMap["currentPage"].val.toInt(), (int)paramValueMap["currentPage"].dirty);
-				display->clearDisplay();
-				display->setCursor(0,0);
-				print(paramValueMap["currentPage"].val.toInt());
-				paramValueMap["currentPage"].clearDirty();
-			}
-			else {
-				internalCanUpdateDisplay = false;
-				Vector<paramStruct*> params = getCurrent()->getAllParamsInPage();
-//				debugf("params in page = %i", params.size());
-				boolean updated = false;
-
-				//need localcopy of params
-				Vector<String> tempIds;
-				for (int i = 0; i < params.size(); ++i) {
-					paramStruct* param = params.get(i);
-					if(paramValueMap[param->id].dirty) {
-						tempIds.add(param->id);
-						paramValueMap[param->id].clearDirty();
-					}
-				}
-
-				for (int i = 0; i < params.size(); ++i) {
-					paramStruct* param = params.get(i);
-					if (tempIds.contains(param->id)) {
-//						debugf("updating param %s", param->id.c_str());
-						display->writeover(param->t, paramValueMap[param->id].val);
-						updated = true;
-					}
-				}
-				internalCanUpdateDisplay = true;
-				if (updated) {
-					display->display();
-				}
-			}
-		}
-	}
+	void handleUpdateTimer();
 
 	void setCurrent(int index) {
 //		if (index >= mChildern.size()) {

@@ -100,13 +100,70 @@ paramStruct* InfoLine::getParamById(String id)
 }
 
 bool InfoPage::checkEditModeAvailble(){
-	Vector<paramStruct*> params = getAllParamsInPage();
+	Vector<paramStruct*> params(getAllParamsInPage());
 	for (int i = 0; i < params.size(); ++i) {
 		if (params.elementAt(i)->editable) {
 			return true;
 		}
 	}
 	return false;
+}
+
+void InfoScreens::handleUpdateTimer() {
+//		debugf("can updatedisplay=%i", canUpdateDisplay());
+
+	if(canUpdateDisplay() && internalCanUpdateDisplay) {
+		if (mChildern.size() == 0) {
+			debugf("I cannot print anything, no Pages declared, setting to NOT update display");
+			setCanUpdateDisplay(false);
+			return;
+		}
+
+		long current = millis();
+		//in case of edit mode, flip every x mills the line (blink)
+		if(viewMode == ViewMode::EDIT && current >= (lastEditModeBlinkTime + editModeBlinkTime)) {
+			lastEditModeBlinkTime = current;
+			blinkDrawn = !blinkDrawn;
+			display->drawRect(0,0, 120, 100, blinkDrawn ? WHITE : BLACK);
+		}
+
+		if (paramValueMap["currentPage"].dirty) {
+//				debugf("currentPage = %i, paramValueMap['currentPage'].dirty= %d",paramValueMap["currentPage"].val.toInt(), (int)paramValueMap["currentPage"].dirty);
+			display->clearDisplay();
+			display->setCursor(0,0);
+			print(paramValueMap["currentPage"].val.toInt());
+			paramValueMap["currentPage"].clearDirty();
+		}
+		else {
+			internalCanUpdateDisplay = false;
+			Vector<paramStruct*> params(getCurrent()->getAllParamsInPage());
+//				debugf("params in page = %i", params.size());
+			boolean updated = false;
+
+			//need localcopy of params
+			Vector<String> tempIds;
+			for (int i = 0; i < params.size(); ++i) {
+				paramStruct* param = params.get(i);
+				if(paramValueMap[param->id].dirty) {
+					tempIds.add(param->id);
+					paramValueMap[param->id].clearDirty();
+				}
+			}
+
+			for (int i = 0; i < params.size(); ++i) {
+				paramStruct* param = params.get(i);
+				if (tempIds.contains(param->id)) {
+//						debugf("updating param %s", param->id.c_str());
+					display->writeover(param->t, paramValueMap[param->id].val);
+					updated = true;
+				}
+			}
+			internalCanUpdateDisplay = true;
+			if (updated) {
+				display->display();
+			}
+		}
+	}
 }
 
 void InfoScreens::setCanUpdateDisplay(bool newState){
