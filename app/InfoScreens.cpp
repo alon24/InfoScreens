@@ -162,6 +162,7 @@ paramStruct* InfoPage::getCurrentEditParam(){
 }
 
 paramStruct* InfoPage::movetoNextEditParam(){
+	setLastSelected(getCurrentEditParam());
 	Vector<paramStruct*> v = getallEditableParams();
 	currentEditedParam++;
 	if (currentEditedParam>=v.size()){
@@ -338,6 +339,12 @@ void InfoScreens::handleScreenUpdateTimer() {
 			internalCanUpdateDisplay = true;
 			if (updated) {
 				display->display();
+			}
+
+			if (getCurrent()->lastSelectedParam){
+				drawBlinkParamLine(getCurrent()->lastSelectedParam, BLACK);
+
+				getCurrent()->setLastSelected(NULL);
 			}
 
 			long current = millis();

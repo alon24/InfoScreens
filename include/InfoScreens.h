@@ -157,7 +157,10 @@ private:
 	int currentEditedParam = -1;
 	Vector<paramStruct> params;
 
+
 public:
+	paramStruct* lastSelectedParam = NULL; //used for removing the undeline when moved
+
 	InfoPage(String id, String header) : BaseInfoElement(id) {
 		m_header = header;
 	};
@@ -175,6 +178,14 @@ public:
 
 	void setEditable(bool editable) {
 		this->editable = editable;
+	}
+
+	void setLastSelected(paramStruct* p = NULL) {
+		if (p) {
+			lastSelectedParam = p;
+		} else {
+			lastSelectedParam = NULL;
+		}
 	}
 
 	paramStruct* getCurrentEditParam();
