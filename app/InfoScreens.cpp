@@ -125,21 +125,50 @@ paramStruct* InfoLine::getParamById(String id)
 	return NULL;
 }
 
-paramStruct* InfoPage::getNextEditParam(){
-	int next = currentEditedLine;
-//	bool found = false;
-//	while (!found) {
-////		if (next)
-//	}
-	for (int i = 0; i <mChildren.size() ; ++i) {
-//		debugf("checking line %i", i );
-		InfoLine* line = mChildren.elementAt(i);
-		if (line->isEditable()){
-//			debugf("found line %i", i );
-			return line->getEditableParam(0);
+Vector<paramStruct*> InfoPage::getAllParamsInPage() {
+	Vector<paramStruct*> ret;
+	for (int i = 0; i < mChildren.size(); ++i) {
+//			debugf("222");
+		InfoLine* l = mChildren.elementAt(i);
+		//add all the params in the line
+		for (int j = 0; j < l->params.size(); ++j) {
+			ret.add(l->params.elementAt(j));
 		}
 	}
 
+	return ret;
+}
+
+Vector<paramStruct*> InfoPage::getallEditableParams(){
+	Vector<paramStruct*> v = getAllParamsInPage();
+	Vector<paramStruct*> ret;
+	for (int i = 0; i < v.size(); ++i) {
+		paramStruct* p = v.elementAt(i);
+		if (p->editable) {
+			ret.add(p);
+		}
+	}
+
+	return ret;
+}
+
+paramStruct* InfoPage::getCurrentEditParam(){
+	if (currentEditedParam == -1) {
+		return NULL;
+	}
+
+	Vector<paramStruct*> v = getallEditableParams();
+	return v.elementAt(currentEditedParam);
+}
+
+paramStruct* InfoPage::movetoNextEditParam(){
+	Vector<paramStruct*> v = getallEditableParams();
+	currentEditedParam++;
+	if (currentEditedParam>=v.size()){
+		currentEditedParam = 0;
+	}
+	debugf("getNextEditParam next param is %i", currentEditedParam);
+	return v.get(currentEditedParam);
 }
 
 bool InfoPage::checkEditModeAvailble(){
@@ -153,7 +182,7 @@ bool InfoPage::checkEditModeAvailble(){
 }
 
 void InfoPage::initEditMode() {
-	currentEditedLine = -1;
+	currentEditedParam = -1;
 }
 
 
@@ -211,10 +240,13 @@ void InfoScreens::setViewMode(ViewMode mode) {
 	if(mode == ViewMode::INFO) {
 		btn.enablePressAndHold(false);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+
 	} else {
 		btn.enablePressAndHold(true);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
+		getCurrent()->movetoNextEditParam();
 	}
+
 }
 
 bool InfoScreens::checkEditModeAvailble() {
@@ -318,11 +350,17 @@ void InfoScreens::handleScreenUpdateTimer() {
 //				display->fillRect(124, 0, 128, 4, blinkDrawn ? WHITE : BLACK);
 
 				drawEditModeSign(124, 0);
-				paramStruct* p = getCurrent()->getNextEditParam();
-				display->drawFastHLine(p->t.x, p->t.y+1, p->maxSize, blinkDrawn ? WHITE : BLACK);
+				if (getCurrent()->getCurrentEditParam() != NULL) {
+					paramStruct* p = getCurrent()->getCurrentEditParam();
+					drawBlinkParamLine(p, blinkDrawn ? WHITE : BLACK);
+				}
 			}
 		}
 	}
+}
+
+void InfoScreens::drawBlinkParamLine(paramStruct* p, int color){
+	display->drawFastHLine(p->t.x, p->t.y+6+1, p->maxSize, color);
 }
 
 void InfoScreens::drawEditModeSign(int x, int y) {
@@ -368,12 +406,14 @@ void InfoScreens::editModeBtnClicked(MultiFunctionButtonAction event)
 	switch (event) {
 		case BTN_CLICK:
 			debugf("edit - click");
+			getCurrent()->movetoNextEditParam();
 //			moveRight();
 //				handleClick();
 			break;
 		case BTN_DOUBLE_CLICK:
 			debugf("return to View mode");
 			setViewMode(ViewMode::INFO);
+			show();
 //			moveLeft();
 //				handleDoubleClick();
 			break;

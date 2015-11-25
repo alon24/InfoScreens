@@ -40,8 +40,10 @@ void initInfoScreens() {
 	el3->addParam("ap", "0.0.0.0");
 
 	InfoLine* el4 = p1->createLine("4", "sta:");
-	el4->addParam("station", "0.0.0.0");
+	el4->addParam("station", "0.0.0.0", true,6);
+
 	paramStruct* ps1 = p1->createLine("ssid", "ID: ")->addParam("ssid", "Not Connected", true, 6);
+
 	paramDataValues ssidVals;
 	ssidVals.addValue("s1");
 	ssidVals.addValue("s2");

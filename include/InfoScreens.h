@@ -154,7 +154,9 @@ private:
 	Vector<InfoLine*> mChildren;
 	String m_header;
 	bool editable = false;
-	int currentEditedLine = -1;
+	int currentEditedParam = -1;
+	Vector<paramStruct> params;
+
 public:
 	InfoPage(String id, String header) : BaseInfoElement(id) {
 		m_header = header;
@@ -175,7 +177,12 @@ public:
 		this->editable = editable;
 	}
 
-	paramStruct* getNextEditParam();
+	paramStruct* getCurrentEditParam();
+	paramStruct* movetoNextEditParam();
+
+	void initEdit() {
+		currentEditedParam = -1;
+	}
 
 	void addElemenet(InfoLine* el){
 		el->setParent(this);
@@ -214,19 +221,8 @@ public:
 		return ret;
 	}
 
-	Vector<paramStruct*> getAllParamsInPage() {
-		Vector<paramStruct*> ret;
-		for (int i = 0; i < mChildren.size(); ++i) {
-//			debugf("222");
-			InfoLine* l = mChildren.elementAt(i);
-			//add all the params in the line
-			for (int j = 0; j < l->params.size(); ++j) {
-				ret.add(l->params.elementAt(j));
-			}
-		}
-
-		return ret;
-	}
+	Vector<paramStruct*> getAllParamsInPage();
+	Vector<paramStruct*> getallEditableParams();
 
 	/**
 	 * check if there are params on page which are editable
@@ -285,7 +281,6 @@ private:
 
 	bool updateDisplay = false;
 	bool internalCanUpdateDisplay = true;
-//	unsigned long lastUpdateTime = 0;
 	Timer screenUpdateTimer;
 	int btnPin=0;
 	long lastClickTime = 0;
@@ -320,6 +315,10 @@ public:
 	void addPage(InfoPage* page);
 	void show() {
 //		lastUpdateTime = millis();
+		setCanUpdateDisplay(false);
+		display->clearDisplay();
+		display->display();
+		paramValueMap["currentPage"].dirty = true;
 		setCanUpdateDisplay(true);
 	}
 
@@ -363,6 +362,8 @@ private:
 	void editModeBtnClicked(MultiFunctionButtonAction event);
 	void setCurrent(int index);
 	void drawEditModeSign(int x, int y);
+	void drawBlinkParamLine(paramStruct* p, int color);
+
 };
 
 
