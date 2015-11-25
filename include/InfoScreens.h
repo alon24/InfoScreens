@@ -73,11 +73,12 @@ struct paramData {
 struct paramStruct{
 	textRect t;
 	String id;
+	int maxSize;
 
 	//need to be able to set for each instance or param!!!
 	boolean editable = false;
 
-	void init(String id, String text, textRect t, bool edit=false) {
+	void init(String id, textRect t, bool edit=false, int maxSize =-1) {
 		this->id = id;
 		this->t = t;
 		this->editable = edit;
@@ -125,15 +126,16 @@ class InfoLine : public BaseInfoElement
 	int m_textSize;
 	bool initialized = false;
 public:
-
 	Vector<paramStruct*> params;
 	int mX, mY, mWidth;
 	InfoLine(String id, String text, int size);
 	int getTextSize();
 	String getText();
-	paramStruct* addParam(String id, String text, bool editable = false, textRect* initial = NULL);
+	paramStruct* addParam(String id, String text, bool editable = false, int maxLineSize = -1);
 //	paramStruct* addParam(String id, String text, textRect initial);
 
+	bool isEditable();
+	paramStruct* getEditableParam(int index);
 	//prints the element
 	void print();
 	paramStruct* getParamById(String id);
@@ -152,7 +154,7 @@ private:
 	Vector<InfoLine*> mChildren;
 	String m_header;
 	bool editable = false;
-	int currentEditedLine = 0;;
+	int currentEditedLine = -1;
 public:
 	InfoPage(String id, String header) : BaseInfoElement(id) {
 		m_header = header;
@@ -173,7 +175,7 @@ public:
 		this->editable = editable;
 	}
 
-	int getNextEditLine();
+	paramStruct* getNextEditParam();
 
 	void addElemenet(InfoLine* el){
 		el->setParent(this);
@@ -230,6 +232,7 @@ public:
 	 * check if there are params on page which are editable
 	 */
 	bool checkEditModeAvailble();
+	void initEditMode();
 
 	//No screen update
 	void updateParamValue(String id, String newData) {

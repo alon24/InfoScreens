@@ -23,8 +23,21 @@ InfoLine::InfoLine(String id, String text, int size = 1) : BaseInfoElement(id)
 int InfoLine::InfoLine::getTextSize()
 {
 	return m_textSize;
+};
+
+bool InfoLine::isEditable(){
+	for (int i = 0; i < params.size(); ++i) {
+		if (params.elementAt(i)->editable) {
+			return true;
+		}
+	}
+
+	return false;
 }
-;
+
+paramStruct* InfoLine::getEditableParam(int index){
+	return params.elementAt(index);
+}
 
 String InfoLine::InfoLine::getText()
 {
@@ -32,7 +45,7 @@ String InfoLine::InfoLine::getText()
 }
 
 //Not handling initial yet
-paramStruct* InfoLine::addParam(String id, String text, bool editable, textRect* initial)
+paramStruct* InfoLine::addParam(String id, String text, bool editable, int maxLineSize)
 {
 	paramStruct* ret = new paramStruct();
 //	getParent()->updateParamValue(id, text);
@@ -45,6 +58,7 @@ paramStruct* InfoLine::addParam(String id, String text, bool editable, textRect*
 
 	ret->id = id;
 	ret->editable = editable;
+	ret->maxSize = maxLineSize * 8;
 	params.add(ret);
 	return ret;
 }
@@ -111,7 +125,21 @@ paramStruct* InfoLine::getParamById(String id)
 	return NULL;
 }
 
-int InfoPage::getNextEditLine(){
+paramStruct* InfoPage::getNextEditParam(){
+	int next = currentEditedLine;
+//	bool found = false;
+//	while (!found) {
+////		if (next)
+//	}
+	for (int i = 0; i <mChildren.size() ; ++i) {
+//		debugf("checking line %i", i );
+		InfoLine* line = mChildren.elementAt(i);
+		if (line->isEditable()){
+//			debugf("found line %i", i );
+			return line->getEditableParam(0);
+		}
+	}
+
 }
 
 bool InfoPage::checkEditModeAvailble(){
@@ -123,6 +151,11 @@ bool InfoPage::checkEditModeAvailble(){
 	}
 	return false;
 }
+
+void InfoPage::initEditMode() {
+	currentEditedLine = -1;
+}
+
 
 InfoPage* InfoScreens::createPage(String id, String header){
 	InfoPage* el = new InfoPage(id, header);
@@ -285,6 +318,8 @@ void InfoScreens::handleScreenUpdateTimer() {
 //				display->fillRect(124, 0, 128, 4, blinkDrawn ? WHITE : BLACK);
 
 				drawEditModeSign(124, 0);
+				paramStruct* p = getCurrent()->getNextEditParam();
+				display->drawFastHLine(p->t.x, p->t.y+1, p->maxSize, blinkDrawn ? WHITE : BLACK);
 			}
 		}
 	}
