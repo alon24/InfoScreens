@@ -31,6 +31,6 @@ public:
 	textRect* getCurrentRect();
 
 	void blink(textRect loc, bool showMarker);
-
+	int getMaxLines();
 };
 #endif /* INCLUDE_SSD1306_DRIVER_H_ */

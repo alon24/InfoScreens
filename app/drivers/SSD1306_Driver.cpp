@@ -67,6 +67,10 @@ textRect* SSD1306_Driver::getCurrentRect() {
 	t->y = cursor_y;
 }
 
+int SSD1306_Driver::getMaxLines() {
+	return 6;
+}
+
 void SSD1306_Driver::blink(textRect loc, bool showMarker) {
 
 }

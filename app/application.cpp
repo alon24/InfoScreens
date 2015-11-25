@@ -43,6 +43,10 @@ void initInfoScreens() {
 	el4->addParam("station", "0.0.0.0");
 
 	p1->createLine("ssid", "ID: ")->addParam("ssid", "Not Connected", true);
+	paramDataValues ssidVals;
+	ssidVals.addValue("s1");
+	ssidVals.addValue("s2");
+	infos->setEditModeValues("ssid", ssidVals);
 
 	p1->createLine("time2", "time:")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 

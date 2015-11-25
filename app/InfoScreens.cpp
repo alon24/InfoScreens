@@ -111,6 +111,9 @@ paramStruct* InfoLine::getParamById(String id)
 	return NULL;
 }
 
+int InfoPage::getNextEditLine(){
+}
+
 bool InfoPage::checkEditModeAvailble(){
 	Vector<paramStruct*> params(getAllParamsInPage());
 	for (int i = 0; i < params.size(); ++i) {
@@ -136,6 +139,10 @@ void InfoScreens::addPage(InfoPage* page) {
 	page->setParent(this);
 	page->setDisplay(&*display);
 	mChildern.add(page);
+}
+
+void InfoScreens::setEditModeValues(String id, paramDataValues values){
+	paramEditValueMap[id] = values;
 }
 
 void InfoScreens::updateParamValue(String id, String newData) {

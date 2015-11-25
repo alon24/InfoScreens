@@ -22,6 +22,10 @@ struct paramDataValues {
 		data.add(str);
 	}
 
+	void addValue(String val) {
+		data.add(val);
+	}
+
 	//for adding chars like a-z for passwords
 	void initChars(int start, int end) {
 		data.clear();
@@ -144,8 +148,11 @@ public:
 };
 
 class InfoPage : public BaseInfoElement{
+private:
 	Vector<InfoLine*> mChildren;
 	String m_header;
+	bool editable = false;
+	int currentEditedLine = 0;;
 public:
 	InfoPage(String id, String header) : BaseInfoElement(id) {
 		m_header = header;
@@ -161,6 +168,12 @@ public:
 		addElemenet(el);
 		return el;
 	}
+
+	void setEditable(bool editable) {
+		this->editable = editable;
+	}
+
+	int getNextEditLine();
 
 	void addElemenet(InfoLine* el){
 		el->setParent(this);
@@ -265,6 +278,7 @@ class InfoScreens : public BaseInfoElement{
 private:
 	Vector<InfoPage*> mChildern;
 	HashMap<String, paramData> paramValueMap;
+	HashMap<String, paramDataValues> paramEditValueMap;
 
 	bool updateDisplay = false;
 	bool internalCanUpdateDisplay = true;
@@ -331,6 +345,7 @@ public:
 		return paramValueMap[id];
 	}
 
+	void setEditModeValues(String id, paramDataValues values);
 	void updateParamValue(String id, String newData); //no screen update
 	void setCanUpdateDisplay(bool newState);
 	bool canUpdateDisplay();
