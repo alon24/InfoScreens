@@ -118,7 +118,106 @@ bool InfoPage::checkEditModeAvailble(){
 	return false;
 }
 
-void InfoScreens::handleUpdateTimer() {
+//InfoScreens
+
+//no screen update
+void InfoScreens::updateParamValue(String id, String newData) {
+	if (paramValueMap.contains(id)) {
+		paramValueMap[id].update(newData);
+//			paramValueMap.remove(id);
+	}
+	else {
+		paramData p;
+		p.update(newData);
+		paramValueMap[id] = p;
+	}
+}
+
+void InfoScreens::setCanUpdateDisplay(bool newState){
+		this->updateDisplay = newState;
+	}
+
+bool InfoScreens::canUpdateDisplay(){
+	return updateDisplay;
+}
+
+int InfoScreens::count() {
+	return mChildern.size();
+}
+
+void InfoScreens::setViewMode(ViewMode mode) {
+	if (viewMode == mode) {
+		return;
+	}
+
+	this->viewMode = mode;
+	if(mode == ViewMode::INFO) {
+		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+	} else {
+		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
+	}
+}
+
+bool InfoScreens::checkEditModeAvailble() {
+	return getCurrent()->checkEditModeAvailble();
+}
+
+void InfoScreens::moveRight() {
+//		debugf("start mem %d",system_get_free_heap_size());
+	if (mChildern.size() == 1) {
+		return;
+	}
+
+////		debugf("moveRight mills=%lu", lastUpdateTime);
+	int current = paramValueMap["currentPage"].val.toInt();
+
+//		debugf("moveRight mCurrent=%i" , current);
+	if (current + 1 < mChildern.size()) {
+		current++;
+	}
+	else {
+		current = 0;
+	}
+//		debugf("moveRight mCurrent after=%i" , current);
+	paramValueMap["currentPage"].update(String(current));
+//		debugf("end mem %d",system_get_free_heap_size());
+}
+
+void InfoScreens::moveLeft() {
+	if (mChildern.size() == 1) {
+		return;
+	}
+	int current = paramValueMap["currentPage"].val.toInt();
+//		debugf("moveLeft mCurrent=%i" , current);
+
+	if (current - 1 >= 0) {
+		current--;
+	}
+	else {
+		current = mChildern.size()-1;
+	}
+
+//		debugf("moveLeft mCurrent after=%i" , current);
+	paramValueMap["currentPage"].update(String(current));
+}
+
+InfoPage* InfoScreens::createPage(String id, String header){
+	InfoPage* el = new InfoPage(id, header);
+	el->setParent(this);
+	el->setDisplay(&*display);
+	mChildern.add(el);
+	return el;
+}
+
+void InfoScreens::addPage(InfoPage* page) {
+	page->setParent(this);
+	page->setDisplay(&*display);
+	mChildern.add(page);
+}
+
+//InfoScreeens private
+
+void InfoScreens::handleScreenUpdateTimer() {
 //		debugf("can updatedisplay=%i", canUpdateDisplay());
 
 	if(canUpdateDisplay() && internalCanUpdateDisplay) {
@@ -178,16 +277,14 @@ void InfoScreens::handleUpdateTimer() {
 	}
 }
 
-void InfoScreens::setCanUpdateDisplay(bool newState){
-		this->updateDisplay = newState;
-	}
+void InfoScreens::print(int pIndex) {
+	internalCanUpdateDisplay = false;
 
-bool InfoScreens::canUpdateDisplay(){
-	return updateDisplay;
-}
-
-int InfoScreens::count() {
-	return mChildern.size();
+	InfoPage* p = get(pIndex);
+//		debugf("print,3 %s", p->getId().c_str() );
+	p->print();
+//		debugf("print, 4");
+	internalCanUpdateDisplay = true;
 }
 
 void InfoScreens::infoModeBtnClicked(MultiFunctionButtonAction event)
@@ -238,19 +335,19 @@ void InfoScreens::editModeBtnClicked(MultiFunctionButtonAction event)
 	}
 }
 
-void InfoScreens::changeViewMode(ViewMode mode) {
-	if (viewMode == mode) {
-		return;
+void InfoScreens::setCurrent(int index) {
+//		if (index >= mChildern.size()) {
+//			return;
+//		}
+	debugf("setCurrent-cur=%i", index);
+	if (paramValueMap.contains("currentPage")) {
+		paramValueMap["currentPage"].update(String(index));
 	}
-
-	this->viewMode = mode;
-	if(mode == ViewMode::INFO) {
-		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
-	} else {
-		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
+	else {
+		paramData p;
+		p.update(String(index));
+//			debugf("setCurrent - new param -cur= %i, %s",index, String(index).c_str());
+		paramValueMap["currentPage"] = p;
 	}
-}
-
-bool InfoScreens::checkEditModeAvailble() {
-	return getCurrent()->checkEditModeAvailble();
+//		mCurrent = index;
 }

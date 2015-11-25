@@ -12,23 +12,45 @@
 #include <drivers/SSD1306_Driver.h>
 #include "utils/MultiFunctionButton.h"
 
+struct paramDataValues {
+	//TODO:ilan maybe have Vector<String*>
+	Vector<String> data;
 
+	//for adding simple strings (one string)
+	void initString(const String& str){
+		data.clear();
+		data.add(str);
+	}
 
+	//for adding chars like a-z for passwords
+	void initChars(int start, int end) {
+		data.clear();
+		for (int i = 0;  i < (end-start); ++i) {
+			data.add(String(i));
+		}
+	}
 
+	//only the first (one) value)
+	String getFirstValue(int index) {
+		return data.elementAt(index);
+	}
 
-//#define TIME_BETWEEN_SCREEN_CHANGE 300
-
-enum class ParamaterActionType {
-	Static = 0,
-	Dynamic = 1
+	//get all values
+	//TODO:ilan maybe clone the vector
+	Vector<String> getAllValues() {
+		return data;
+	}
 };
+
+//class letters {
+//
+//};
 
 struct paramData {
 	bool dirty = false;
 	String val;
 	bool editable = false;
 	Vector<String*> values;
-	ParamaterActionType type = ParamaterActionType::Static;
 
 	void update(String newVal) {
 		val = newVal;
@@ -39,28 +61,9 @@ struct paramData {
 		dirty = false;
 	}
 
-	void initEditable(Vector<String*> newVals){
-		this->editable = true;
-		values.clear();
-		values.setSize(newVals.size());
-//		values = newVals;
-		for (int i=0; i<newVals.size(); ++i){
-			values.add(newVals.elementAt(i));
-		}
-	}
-
 	void setEditable(bool state) {
 		this->editable = state;
 	}
-
-	void setValues(Vector< String> newVals) {
-		this->values = values;
-	}
-
-	void addValue(String* data) {
-		this->values.add(data);
-	}
-
 };
 
 struct paramStruct{
@@ -266,7 +269,7 @@ private:
 	bool updateDisplay = false;
 	bool internalCanUpdateDisplay = true;
 //	unsigned long lastUpdateTime = 0;
-	Timer screenupdate;
+	Timer screenUpdateTimer;
 
 	int btnPin=0;
 	long lastClickTime = 0;
@@ -288,31 +291,12 @@ public:
 		btn.initBtn(btnPin);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 
-		screenupdate.setCallback(showScreenUpdateDelegate(&InfoScreens::handleUpdateTimer, this));
-		screenupdate.setIntervalMs(80);
-		screenupdate.start(true);
+		screenUpdateTimer.setCallback(showScreenUpdateDelegate(&InfoScreens::handleScreenUpdateTimer, this));
+		screenUpdateTimer.setIntervalMs(80);
+		screenUpdateTimer.start(true);
 
 		display->print("InfoScreens");
 		Serial.print(display->getCursorY());
-	}
-
-	void handleUpdateTimer();
-
-	void setCurrent(int index) {
-//		if (index >= mChildern.size()) {
-//			return;
-//		}
-		debugf("setCurrent -cur=%i", index);
-		if (paramValueMap.contains("currentPage")) {
-			paramValueMap["currentPage"].update(String(index));
-		}
-		else {
-			paramData p;
-			p.update(String(index));
-//			debugf("setCurrent - new param -cur= %i, %s",index, String(index).c_str());
-			paramValueMap["currentPage"] = p;
-		}
-//		mCurrent = index;
 	}
 
 	void show() {
@@ -326,58 +310,10 @@ public:
 		show();
 	}
 
-	void moveRight() {
-//		debugf("start mem %d",system_get_free_heap_size());
-		if (mChildern.size() == 1) {
-			return;
-		}
-
-////		debugf("moveRight mills=%lu", lastUpdateTime);
-		int current = paramValueMap["currentPage"].val.toInt();
-
-//		debugf("moveRight mCurrent=%i" , current);
-		if (current + 1 < mChildern.size()) {
-			current++;
-		}
-		else {
-			current = 0;
-		}
-//		debugf("moveRight mCurrent after=%i" , current);
-		paramValueMap["currentPage"].update(String(current));
-//		debugf("end mem %d",system_get_free_heap_size());
-	}
-
-	void moveLeft() {
-		if (mChildern.size() == 1) {
-			return;
-		}
-		int current = paramValueMap["currentPage"].val.toInt();
-//		debugf("moveLeft mCurrent=%i" , current);
-
-		if (current - 1 >= 0) {
-			current--;
-		}
-		else {
-			current = mChildern.size()-1;
-		}
-
-//		debugf("moveLeft mCurrent after=%i" , current);
-		paramValueMap["currentPage"].update(String(current));
-	}
-
-	InfoPage* createPage(String id, String header){
-		InfoPage* el = new InfoPage(id, header);
-		el->setParent(this);
-		el->setDisplay(&*display);
-		mChildern.add(el);
-		return el;
-	}
-
-	void addPage(InfoPage* page) {
-		page->setParent(this);
-		page->setDisplay(&*display);
-		mChildern.add(page);
-	}
+	void moveRight();
+	void moveLeft();
+	InfoPage* createPage(String id, String header);
+	void addPage(InfoPage* page);
 
 	InfoPage* get(int index) {
 //		debugf("index = %i, children size  %i", index, mChildern.size());
@@ -395,40 +331,19 @@ public:
 		return paramValueMap[id];
 	}
 
-	//no screen update
-	void updateParamValue(String id, String newData) {
-		if (paramValueMap.contains(id)) {
-			paramValueMap[id].update(newData);
-//			paramValueMap.remove(id);
-		}
-		else {
-			paramData p;
-			p.update(newData);
-			paramValueMap[id] = p;
-		}
-	}
-
+	void updateParamValue(String id, String newData); //no screen update
 	void setCanUpdateDisplay(bool newState);
 	bool canUpdateDisplay();
 	int count();
-
-	void changeViewMode(ViewMode mode);
+	void setViewMode(ViewMode mode);
 	bool checkEditModeAvailble();
 
 private:
-	void print(int pIndex) {
-		internalCanUpdateDisplay = false;
-
-		InfoPage* p = get(pIndex);
-//		debugf("print,3 %s", p->getId().c_str() );
-		p->print();
-//		debugf("print, 4");
-
-		internalCanUpdateDisplay = true;
-	}
-
+	void handleScreenUpdateTimer();
+	void print(int pIndex);
 	void infoModeBtnClicked(MultiFunctionButtonAction event);
 	void editModeBtnClicked(MultiFunctionButtonAction event);
+	void setCurrent(int index);
 };
 
 #endif /* INCLUDE_INFOSCREENS_H_ */
