@@ -78,6 +78,7 @@ public:
 	void setOnButtonEvent(ButtonActionDelegate handler)
 	{
 		delegatedActionEvent  = handler;
+		inResetMode = true;
 		if (!buttonTimer.isStarted()) {
 			buttonTimer.initializeMs(80, TimerDelegate(&MultiFunctionButton::actOnButton, this)).start();
 		}
@@ -87,6 +88,14 @@ public:
 	{
 		int event = 0;
 		buttonVal = digitalRead(m_buttonPin);
+
+		if (buttonVal == HIGH && inResetMode) {
+			inResetMode = false;
+		}
+
+		if (inResetMode) {
+			return 0;
+		}
 		// Button pressed down
 		if (buttonVal == LOW && buttonLast == HIGH
 				&& (millis() - upTime) > debounce)
@@ -205,6 +214,10 @@ private:
 	long upTime = -1;           // time the button was released
 	long lastPressAndHoldTime = -1; // time the pressAndHold was activated last
 	int m_buttonPin =-1;
+
+	//After changing handlers, need to be able to init until first down, becuase if switch was made becuase of long click, then
+	// button is still down
+	bool inResetMode = false;
 
 	// Button variables
 	boolean buttonVal = HIGH;   // value read from button

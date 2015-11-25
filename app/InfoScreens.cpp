@@ -306,12 +306,10 @@ void InfoScreens::infoModeBtnClicked(MultiFunctionButtonAction event)
 		case BTN_CLICK:
 			debugf("click");
 			moveRight();
-	//				handleClick();
 			break;
 		case BTN_DOUBLE_CLICK:
 			debugf("BTN_DOUBLE_CLICK");
 			moveLeft();
-	//				handleDoubleClick();
 			break;
 		case BTN_LONG_CLICK:
 			debugf("BTN_LONG_CLICK, going to edit mode");
