@@ -127,8 +127,8 @@ public:
 	InfoLine(String id, String text, int size);
 	int getTextSize();
 	String getText();
-	paramStruct* addParam(String id, String text);
-	paramStruct* addParam(String id, String text, textRect initial);
+	paramStruct* addParam(String id, String text, bool editable = false, textRect* initial = NULL);
+//	paramStruct* addParam(String id, String text, textRect initial);
 
 	//prints the element
 	void print();
@@ -270,13 +270,12 @@ private:
 	bool internalCanUpdateDisplay = true;
 //	unsigned long lastUpdateTime = 0;
 	Timer screenUpdateTimer;
-
 	int btnPin=0;
 	long lastClickTime = 0;
 	BtnMode btnMode = BtnMode::None;
 	int waitTimeForClick = 200;
 	MultiFunctionButton btn;
-	ViewMode viewMode = ViewMode::EDIT;
+	ViewMode viewMode = ViewMode::INFO;
 	long lastEditModeBlinkTime = -1;
 	long editModeBlinkTime = 800;
 	bool blinkDrawn = false;
@@ -289,6 +288,7 @@ public:
 
 		this->btnPin = btnPin;
 		btn.initBtn(btnPin);
+		btn.enablePressAndHold(false);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 
 		screenUpdateTimer.setCallback(showScreenUpdateDelegate(&InfoScreens::handleScreenUpdateTimer, this));
@@ -299,6 +299,8 @@ public:
 		Serial.print(display->getCursorY());
 	}
 
+	InfoPage* createPage(String id, String header);
+	void addPage(InfoPage* page);
 	void show() {
 //		lastUpdateTime = millis();
 		setCanUpdateDisplay(true);
@@ -312,8 +314,6 @@ public:
 
 	void moveRight();
 	void moveLeft();
-	InfoPage* createPage(String id, String header);
-	void addPage(InfoPage* page);
 
 	InfoPage* get(int index) {
 //		debugf("index = %i, children size  %i", index, mChildern.size());
@@ -344,6 +344,9 @@ private:
 	void infoModeBtnClicked(MultiFunctionButtonAction event);
 	void editModeBtnClicked(MultiFunctionButtonAction event);
 	void setCurrent(int index);
+	void drawEditModeSign(int x, int y);
 };
+
+
 
 #endif /* INCLUDE_INFOSCREENS_H_ */

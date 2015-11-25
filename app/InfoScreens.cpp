@@ -31,10 +31,12 @@ String InfoLine::InfoLine::getText()
 	return m_text;
 }
 
-paramStruct* InfoLine::addParam(String id, String text)
+//Not handling initial yet
+paramStruct* InfoLine::addParam(String id, String text, bool editable, textRect* initial)
 {
 	paramStruct* ret = new paramStruct();
-	getParent()->updateParamValue(id, text);
+//	getParent()->updateParamValue(id, text);
+	updateParamValue(id, text);
 //	ret->text = text;
 	ret->t.x = -1;
 	ret->t.y = -1;
@@ -42,19 +44,20 @@ paramStruct* InfoLine::addParam(String id, String text)
 	ret->t.w = -1;
 
 	ret->id = id;
+	ret->editable = editable;
 	params.add(ret);
 	return ret;
 }
 
-paramStruct* InfoLine::addParam(String id, String text, textRect initial)
-{
-	paramStruct* ret = addParam(id, text);
-	ret->t.x = initial.x;
-	ret->t.y = initial.y;
-	ret->t.h = initial.h;
-	ret->t.w = initial.w;
-	return ret;
-}
+//paramStruct* InfoLine::addParam(String id, String text, textRect initial)
+//{
+//	paramStruct* ret = addParam(id, text);
+//	ret->t.x = initial.x;
+//	ret->t.y = initial.y;
+//	ret->t.h = initial.h;
+//	ret->t.w = initial.w;
+//	return ret;
+//}
 
 //prints the element
 void InfoLine::print()
@@ -118,9 +121,23 @@ bool InfoPage::checkEditModeAvailble(){
 	return false;
 }
 
+InfoPage* InfoScreens::createPage(String id, String header){
+	InfoPage* el = new InfoPage(id, header);
+	el->setParent(this);
+	el->setDisplay(&*display);
+	mChildern.add(el);
+	return el;
+}
+
 //InfoScreens
 
 //no screen update
+void InfoScreens::addPage(InfoPage* page) {
+	page->setParent(this);
+	page->setDisplay(&*display);
+	mChildern.add(page);
+}
+
 void InfoScreens::updateParamValue(String id, String newData) {
 	if (paramValueMap.contains(id)) {
 		paramValueMap[id].update(newData);
@@ -152,8 +169,10 @@ void InfoScreens::setViewMode(ViewMode mode) {
 
 	this->viewMode = mode;
 	if(mode == ViewMode::INFO) {
+		btn.enablePressAndHold(false);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 	} else {
+		btn.enablePressAndHold(true);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
 	}
 }
@@ -199,20 +218,6 @@ void InfoScreens::moveLeft() {
 
 //		debugf("moveLeft mCurrent after=%i" , current);
 	paramValueMap["currentPage"].update(String(current));
-}
-
-InfoPage* InfoScreens::createPage(String id, String header){
-	InfoPage* el = new InfoPage(id, header);
-	el->setParent(this);
-	el->setDisplay(&*display);
-	mChildern.add(el);
-	return el;
-}
-
-void InfoScreens::addPage(InfoPage* page) {
-	page->setParent(this);
-	page->setDisplay(&*display);
-	mChildern.add(page);
 }
 
 //InfoScreeens private
@@ -270,11 +275,19 @@ void InfoScreens::handleScreenUpdateTimer() {
 				blinkDrawn = !blinkDrawn;
 	//			display->drawRect(0,0, 128, 64, blinkDrawn ? WHITE : BLACK);
 //				display->drawPixel(127,0 , blinkDrawn ? WHITE : BLACK);
-				display->fillRect(126, 0, 128, 2, blinkDrawn ? WHITE : BLACK);
-//				display->display();
+//				display->fillRect(124, 0, 128, 4, blinkDrawn ? WHITE : BLACK);
+
+				drawEditModeSign(124, 0);
 			}
 		}
 	}
+}
+
+void InfoScreens::drawEditModeSign(int x, int y) {
+	display->drawFastHLine(x, y, 3, blinkDrawn ? WHITE : BLACK);
+	display->drawFastHLine(x, y+2, 3, blinkDrawn ? WHITE : BLACK);
+	display->drawFastHLine(x, y+4, 3, blinkDrawn ? WHITE : BLACK);
+	display->drawFastVLine(x, y, y+4, blinkDrawn ? WHITE : BLACK);
 }
 
 void InfoScreens::print(int pIndex) {
@@ -300,13 +313,12 @@ void InfoScreens::infoModeBtnClicked(MultiFunctionButtonAction event)
 			moveLeft();
 	//				handleDoubleClick();
 			break;
-		case BTN_HOLD_CLICK:
-			debugf("BTN_HOLD_CLICK");
-	//				handleLongClick();
-			break;
 		case BTN_LONG_CLICK:
-			debugf("BTN_LONG_CLICK");
-	//				handleHoldClick();
+			debugf("BTN_LONG_CLICK, going to edit mode");
+			setViewMode(ViewMode::EDIT);
+			break;
+		case BTN_HOLD_CLICK:
+			debugf("BTN_HOLD_CLICK, going to edit mode");
 			break;
 	}
 }
@@ -315,22 +327,22 @@ void InfoScreens::editModeBtnClicked(MultiFunctionButtonAction event)
 {
 	switch (event) {
 		case BTN_CLICK:
-			debugf("click");
-			moveRight();
+			debugf("edit - click");
+//			moveRight();
 //				handleClick();
 			break;
 		case BTN_DOUBLE_CLICK:
-			debugf("BTN_DOUBLE_CLICK");
-			moveLeft();
+			debugf("return to View mode");
+			setViewMode(ViewMode::INFO);
+//			moveLeft();
 //				handleDoubleClick();
+			break;
+		case BTN_LONG_CLICK:
+			debugf("edit - BTN_LONG_CLICK");
+//				handleHoldClick();
 			break;
 		case BTN_HOLD_CLICK:
 			debugf("BTN_HOLD_CLICK");
-//				handleLongClick();
-			break;
-		case BTN_LONG_CLICK:
-			debugf("BTN_LONG_CLICK");
-//				handleHoldClick();
 			break;
 	}
 }
