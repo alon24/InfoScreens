@@ -159,8 +159,6 @@ private:
 
 
 public:
-	paramStruct* lastSelectedParam = NULL; //used for removing the undeline when moved
-
 	InfoPage(String id, String header) : BaseInfoElement(id) {
 		m_header = header;
 	};
@@ -178,14 +176,6 @@ public:
 
 	void setEditable(bool editable) {
 		this->editable = editable;
-	}
-
-	void setLastSelected(paramStruct* p = NULL) {
-		if (p) {
-			lastSelectedParam = p;
-		} else {
-			lastSelectedParam = NULL;
-		}
 	}
 
 	paramStruct* getCurrentEditParam();
@@ -283,6 +273,38 @@ enum class ViewMode {
 	EDIT = 1
 };
 
+struct EditModeBlinkingInfo{
+	void reset() {
+		lastEditModeBlinkTime = -1;
+		blinkDrawn = false;
+	};
+
+	void handleTimeElapsed(long current) {
+		if (current >= (lastEditModeBlinkTime + editModeBlinkTime)){
+			lastEditModeBlinkTime = current;
+			blinkDrawn = !blinkDrawn;
+		}
+	}
+
+	void setLastSelected(paramStruct* p = NULL) {
+		lastSelectedParam = p;
+	}
+
+	bool shouldEraseLast() {
+		if (lastSelectedParam) {
+			return true;
+		}
+
+		return false;
+	}
+
+	long lastEditModeBlinkTime = -1;
+	long editModeBlinkTime = 600;
+	bool blinkDrawn = false;
+
+	paramStruct* lastSelectedParam = NULL;
+};
+
 class InfoScreens : public BaseInfoElement{
 
 private:
@@ -299,9 +321,11 @@ private:
 	int waitTimeForClick = 200;
 	MultiFunctionButton btn;
 	ViewMode viewMode = ViewMode::INFO;
-	long lastEditModeBlinkTime = -1;
-	long editModeBlinkTime = 800;
-	bool blinkDrawn = false;
+
+	EditModeBlinkingInfo editModeInfo;
+//	long lastEditModeBlinkTime = -1;
+//	long editModeBlinkTime = 800;
+//	bool blinkDrawn = false;
 public:
 
 	InfoScreens(String id, SSD1306_Driver *dis, int btnPin) : BaseInfoElement(id)
@@ -365,6 +389,7 @@ public:
 	int count();
 	void setViewMode(ViewMode mode);
 	bool checkEditModeAvailble();
+	paramStruct* moveToNextEditParam();
 
 private:
 	void handleScreenUpdateTimer();
@@ -372,7 +397,7 @@ private:
 	void infoModeBtnClicked(MultiFunctionButtonAction event);
 	void editModeBtnClicked(MultiFunctionButtonAction event);
 	void setCurrent(int index);
-	void drawEditModeSign(int x, int y);
+	void drawEditModeSign(int x, int y, int color);
 	void drawBlinkParamLine(paramStruct* p, int color);
 
 };
