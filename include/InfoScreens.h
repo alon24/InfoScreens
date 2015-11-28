@@ -143,13 +143,9 @@ public:
 	void print();
 	paramStruct* getParamById(String id);
 
-	bool canUpdateDisplay(bool newState) {
-		return parent->canUpdateDisplay();
-	}
-
-	paramData getParamText(String id){
-		return parent->getParamText(id);
-	}
+	bool canUpdateDisplay(bool newState);
+	paramData getParamText(String id);
+	void updateParamValue(String id, String newData);
 };
 
 class InfoPage : public BaseInfoElement{
@@ -265,7 +261,8 @@ enum class BtnMode {
 
 enum class ViewMode {
 	INFO = 0,
-	EDIT = 1
+	EDIT = 1,
+	EDIT_FIELD = 2
 };
 
 struct EditModeBlinkingInfo{
@@ -317,27 +314,10 @@ private:
 	MultiFunctionButton btn;
 	ViewMode viewMode = ViewMode::INFO;
 
-	EditModeBlinkingInfo editModeInfo;
+	EditModeBlinkingInfo editModeBlinkInfo;
 public:
 
-	InfoScreens(SSD1306_Driver *dis, int btnPin) : BaseInfoElement()
-	{
-		this->display = dis;
-		setCurrent(0);
-
-		this->btnPin = btnPin;
-		btn.initBtn(btnPin);
-		btn.enablePressAndHold(false);
-		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
-
-		screenUpdateTimer.setCallback(showScreenUpdateDelegate(&InfoScreens::handleScreenUpdateTimer, this));
-		screenUpdateTimer.setIntervalMs(80);
-		screenUpdateTimer.start(true);
-
-		display->print("InfoScreens");
-		Serial.print(display->getCursorY());
-	}
-
+	InfoScreens(SSD1306_Driver *dis, int btnPin);
 	InfoPage* createPage(String header);
 	void addPage(InfoPage* page);
 	void show() {
@@ -357,14 +337,7 @@ public:
 
 	void moveRight();
 	void moveLeft();
-
-	InfoPage* get(int index) {
-//		debugf("index = %i, children size  %i", index, mChildern.size());
-		if (mChildern.size() >= index) {
-			return mChildern.get(index);
-		}
-		return NULL;
-	}
+	InfoPage* get(int index);
 
 	InfoPage* getCurrent() {
 		return mChildern.get(paramValueMap["currentPage"].val.toInt());
@@ -382,18 +355,17 @@ public:
 	void setViewMode(ViewMode mode);
 	bool checkEditModeAvailble();
 	paramStruct* moveToNextEditParam();
+	String moveToNextValue();
 
+	void infoModeBtnClicked(MultiFunctionButtonAction event);
+	void editModeBtnClicked(MultiFunctionButtonAction event);
+	void editFieldModeBtnClicked(MultiFunctionButtonAction event);
 private:
 	void handleScreenUpdateTimer();
 	void print(int pIndex);
-	void infoModeBtnClicked(MultiFunctionButtonAction event);
-	void editModeBtnClicked(MultiFunctionButtonAction event);
 	void setCurrent(int index);
 	void drawEditModeSign(int x, int y, int color);
 	void drawBlinkParamLine(paramStruct* p, int color);
-
 };
-
-
 
 #endif /* INCLUDE_INFOSCREENS_H_ */

@@ -42,7 +42,7 @@ void initInfoScreens() {
 	InfoLine* el4 = p1->createLine("sta:");
 	el4->addParam("station", "0.0.0.0", true,6);
 
-	paramStruct* ps1 = p1->createLine("ID: ")->addParam("ssid", "Not Connected", true, 6);
+	paramStruct* ps1 = p1->createLine("ID: ")->addParam("ssid", "Edit Me", true, 6);
 
 	paramDataValues ssidVals;
 	ssidVals.addValue("s1");
@@ -63,7 +63,7 @@ void initInfoScreens() {
 	InfoPage* p3 = infos->createPage("P3");
 	p3->createLine("P3Test")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 	p3->createLine("ap:")->addParam("ap", "0.0.0.0");
-	p3->createLine("editable")->addParam("aa", "editme", true, 6);
+	p3->createLine("editable")->addParam("aa", "edit-me", true, 6);
 }
 
 void handleUpdateTimer() {

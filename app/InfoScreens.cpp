@@ -125,6 +125,19 @@ paramStruct* InfoLine::getParamById(String id)
 	return NULL;
 }
 
+bool InfoLine::canUpdateDisplay(bool newState) {
+	return parent->canUpdateDisplay();
+}
+
+paramData InfoLine::getParamText(String id){
+	return parent->getParamText(id);
+}
+
+//No screen update
+void InfoLine::updateParamValue(String id, String newData) {
+	getParent()->updateParamValue(id, newData);
+}
+
 Vector<paramStruct*> InfoPage::getAllParamsInPage() {
 	Vector<paramStruct*> ret;
 	for (int i = 0; i < mChildren.size(); ++i) {
@@ -185,6 +198,23 @@ void InfoPage::initEditMode() {
 	currentEditedParam = -1;
 }
 
+InfoScreens::InfoScreens(SSD1306_Driver *dis, int btnPin) : BaseInfoElement::BaseInfoElement()
+{
+	this->display = dis;
+	setCurrent(0);
+
+	this->btnPin = btnPin;
+	btn.initBtn(btnPin);
+	btn.enablePressAndHold(false);
+	btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+
+	screenUpdateTimer.setCallback(showScreenUpdateDelegate(&InfoScreens::handleScreenUpdateTimer, this));
+	screenUpdateTimer.setIntervalMs(80);
+	screenUpdateTimer.start(true);
+
+	display->print("InfoScreens");
+	Serial.print(display->getCursorY());
+}
 
 InfoPage* InfoScreens::createPage(String header){
 	InfoPage* el = new InfoPage(header);
@@ -241,10 +271,15 @@ void InfoScreens::setViewMode(ViewMode mode) {
 		btn.enablePressAndHold(false);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 
-	} else {
+	} else if(mode == ViewMode::EDIT){
 		btn.enablePressAndHold(true);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
 		moveToNextEditParam();
+	}
+	else if(mode == ViewMode::EDIT_FIELD) {
+		btn.enablePressAndHold(false);
+		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editFieldModeBtnClicked, this));
+//		moveToNextEditParam();
 	}
 
 }
@@ -292,11 +327,26 @@ void InfoScreens::moveLeft() {
 	paramValueMap["currentPage"].update(String(current));
 }
 
+InfoPage* InfoScreens::get(int index) {
+//		debugf("index = %i, children size  %i", index, mChildern.size());
+	if (mChildern.size() >= index) {
+		return mChildern.get(index);
+	}
+	return NULL;
+}
+
 paramStruct* InfoScreens::moveToNextEditParam(){
-	editModeInfo.setLastSelected(getCurrent()->getCurrentEditParam());
+	editModeBlinkInfo.setLastSelected(getCurrent()->getCurrentEditParam());
 //	editModeInfo.setLastSelected(getCurrent()->getCurrentEditParam());
 	paramStruct* ret = getCurrent()->movetoNextEditParam();
-	editModeInfo.reset();
+	editModeBlinkInfo.reset();
+	return ret;
+}
+
+String InfoScreens::moveToNextValue() {
+	String ret;
+	paramDataValues data =  paramEditValueMap[getCurrent()->getCurrentEditParam()->id];
+
 	return ret;
 }
 
@@ -348,17 +398,17 @@ void InfoScreens::handleScreenUpdateTimer() {
 				display->display();
 			}
 
-			if (editModeInfo.shouldEraseLast()) {
-				drawBlinkParamLine(editModeInfo.lastSelectedParam, BLACK);
-				editModeInfo.lastSelectedParam = NULL;
+			if (editModeBlinkInfo.shouldEraseLast()) {
+				drawBlinkParamLine(editModeBlinkInfo.lastSelectedParam, BLACK);
+				editModeBlinkInfo.lastSelectedParam = NULL;
 			}
 
 			long current = millis();
 			int color = BLACK;
-			editModeInfo.handleTimeElapsed(current);
+			editModeBlinkInfo.handleTimeElapsed(current);
 
 			if (viewMode == ViewMode::EDIT) {
-				if (editModeInfo.blinkDrawn) {
+				if (editModeBlinkInfo.blinkDrawn) {
 					color = WHITE;
 				}
 
@@ -425,18 +475,45 @@ void InfoScreens::editModeBtnClicked(MultiFunctionButtonAction event)
 			break;
 		case BTN_DOUBLE_CLICK:
 			debugf("return to View mode");
-			setViewMode(ViewMode::INFO);
-			show();
+//			setViewMode(ViewMode::INFO);
+//			show();
 //			moveLeft();
 //				handleDoubleClick();
 			break;
 		case BTN_LONG_CLICK:
 			debugf("edit - BTN_LONG_CLICK");
+			setViewMode(ViewMode::EDIT_FIELD);
 //				handleHoldClick();
 			break;
 		case BTN_HOLD_CLICK:
 			debugf("BTN_HOLD_CLICK");
 			break;
+	}
+}
+
+void InfoScreens::editFieldModeBtnClicked(MultiFunctionButtonAction event)
+{
+	switch (event) {
+		case BTN_CLICK:
+			debugf("editField - click");
+			moveToNextValue();
+//			moveRight();
+//				handleClick();
+			break;
+		case BTN_DOUBLE_CLICK:
+			debugf("editField - return to View mode");
+			setViewMode(ViewMode::EDIT);
+//			show();
+//			moveLeft();
+//				handleDoubleClick();
+			break;
+//		case BTN_LONG_CLICK:
+//			debugf("edit - BTN_LONG_CLICK");
+////				handleHoldClick();
+//			break;
+//		case BTN_HOLD_CLICK:
+//			debugf("BTN_HOLD_CLICK");
+//			break;
 	}
 }
 
