@@ -31,39 +31,39 @@ void blink()
 }
 
 void initInfoScreens() {
-	InfoPage* p1 = infos->createPage("Main", "Main");
-	InfoLine* el = p1->createLine("header1", "P1Test");
+	InfoPage* p1 = infos->createPage("Main");
+	InfoLine* el = p1->createLine("P1Test");
 	//add the time param
 	el->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 
-	InfoLine* el3 = p1->createLine("3", "ap: ");
+	InfoLine* el3 = p1->createLine("ap: ");
 	el3->addParam("ap", "0.0.0.0");
 
-	InfoLine* el4 = p1->createLine("4", "sta:");
+	InfoLine* el4 = p1->createLine("sta:");
 	el4->addParam("station", "0.0.0.0", true,6);
 
-	paramStruct* ps1 = p1->createLine("ssid", "ID: ")->addParam("ssid", "Not Connected", true, 6);
+	paramStruct* ps1 = p1->createLine("ID: ")->addParam("ssid", "Not Connected", true, 6);
 
 	paramDataValues ssidVals;
 	ssidVals.addValue("s1");
 	ssidVals.addValue("s2");
 	infos->setEditModeValues("ssid", ssidVals);
 
-	p1->createLine("time2", "time:")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
+	p1->createLine("time:")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 
-	InfoPage* p2 = infos->createPage("P2", "P2");
-	InfoLine* el2 = p2->createLine("header2", "P2Test");
+	InfoPage* p2 = infos->createPage("P2");
+	InfoLine* el2 = p2->createLine("P2Test");
 	//add the time param
 	el2->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 
-	p2->createLine("4", "sta:")->addParam("station", "0.0.0.0");
-	InfoLine* el22 = p2->createLine("2", "apdd: ");
+	p2->createLine("sta:")->addParam("station", "0.0.0.0");
+	InfoLine* el22 = p2->createLine("apdd: ");
 	el22->addParam("ap", "0.0.0.0");
 
-	InfoPage* p3 = infos->createPage("P3", "P3");
-	p3->createLine("header3", "P3Test")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
-	p3->createLine("4", "ap:")->addParam("ap", "0.0.0.0");
-	p3->createLine("5", "editable")->addParam("aa", "editme", true, 6);
+	InfoPage* p3 = infos->createPage("P3");
+	p3->createLine("P3Test")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
+	p3->createLine("ap:")->addParam("ap", "0.0.0.0");
+	p3->createLine("editable")->addParam("aa", "editme", true, 6);
 }
 
 void handleUpdateTimer() {
@@ -91,7 +91,7 @@ void init()
 //	display.print("Testing display");
 //	display.display();
 
-	infos = new InfoScreens("InfoScreens", &display, BTN_PIN);
+	infos = new InfoScreens(&display, BTN_PIN);
 	initInfoScreens();
 	infos->show();
 

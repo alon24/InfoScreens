@@ -6,7 +6,7 @@
  */
 #include <InfoScreens.h>
 
-InfoLine::InfoLine(String id, String text, int size = 1) : BaseInfoElement(id)
+InfoLine::InfoLine(String text, int size = 1) : BaseInfoElement()
 {
 	m_text = text;
 	if (size != 1)
@@ -186,8 +186,8 @@ void InfoPage::initEditMode() {
 }
 
 
-InfoPage* InfoScreens::createPage(String id, String header){
-	InfoPage* el = new InfoPage(id, header);
+InfoPage* InfoScreens::createPage(String header){
+	InfoPage* el = new InfoPage(header);
 	el->setParent(this);
 	el->setDisplay(&*display);
 	mChildern.add(el);

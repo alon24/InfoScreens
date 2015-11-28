@@ -94,8 +94,10 @@ protected:
 	SSD1306_Driver* display;
 
 public:
+	//Simplified constructor because not all elements need id
+	BaseInfoElement(){};
 
-	BaseInfoElement(String id) {
+	void setId(String id){
 		this->id = id;
 	};
 
@@ -126,9 +128,10 @@ class InfoLine : public BaseInfoElement
 	int m_textSize;
 	bool initialized = false;
 public:
+	InfoLine(String text, int size);
+	~InfoLine(){};
 	Vector<paramStruct*> params;
 	int mX, mY, mWidth;
-	InfoLine(String id, String text, int size);
 	int getTextSize();
 	String getText();
 	paramStruct* addParam(String id, String text, bool editable = false, int maxLineSize = -1);
@@ -159,15 +162,16 @@ private:
 
 
 public:
-	InfoPage(String id, String header) : BaseInfoElement(id) {
+	InfoPage(String header) : BaseInfoElement() {
+//		setId(id);
 		m_header = header;
 	};
 
 	/**
 	 * creates and adds to parent
 	 */
-	InfoLine* createLine(String id, String text) {
-		InfoLine* el =  new InfoLine(id, text, 1);
+	InfoLine* createLine(String text) {
+		InfoLine* el =  new InfoLine(text, 1);
 		el->setParent(this);
 		el->setDisplay(&*display);
 		addElemenet(el);
@@ -199,15 +203,6 @@ public:
 	{
 		return mChildren;
 	};
-
-	InfoLine* getChildById(String id) {
-		for (int i = 0; i < mChildren.size(); ++i) {
-			if(mChildren.get(i)->getId() == id) {
-				return mChildren.get(i);
-			}
-		}
-		return NULL;
-	}
 
 	Vector<paramStruct*> getAllParamsForId(String id) {
 		Vector<paramStruct*> ret;
@@ -323,12 +318,9 @@ private:
 	ViewMode viewMode = ViewMode::INFO;
 
 	EditModeBlinkingInfo editModeInfo;
-//	long lastEditModeBlinkTime = -1;
-//	long editModeBlinkTime = 800;
-//	bool blinkDrawn = false;
 public:
 
-	InfoScreens(String id, SSD1306_Driver *dis, int btnPin) : BaseInfoElement(id)
+	InfoScreens(SSD1306_Driver *dis, int btnPin) : BaseInfoElement()
 	{
 		this->display = dis;
 		setCurrent(0);
@@ -346,7 +338,7 @@ public:
 		Serial.print(display->getCursorY());
 	}
 
-	InfoPage* createPage(String id, String header);
+	InfoPage* createPage(String header);
 	void addPage(InfoPage* page);
 	void show() {
 //		lastUpdateTime = millis();
