@@ -122,14 +122,13 @@ MultiFunctionButton(int buttonPin, ButtonActionDelegate handler = null, bool pre
 
 #### Important functions
 
-// init to set button, handler is optional here
+// init to set button, handler is optional here </br>
 void initBtn(int buttonPin, ButtonActionDelegate handler = null, bool pressAndHold = true)
 
-//set how to handle long press
+//set how to handle long press  </br>
 void enablePressAndHold(bool pressAndHold)
 
-
-//Delegated call when event is triggered
+//Delegated call when event is triggered </br>
 void setOnButtonEvent(ButtonActionDelegate handler)
 
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/Kv1fsxQzNcM/0.jpg)](https://www.youtube.com/watch?v=Kv1fsxQzNcMo)
