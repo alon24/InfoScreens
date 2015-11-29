@@ -14,15 +14,16 @@
 
 struct paramDataValues {
 	//TODO:ilan maybe have Vector<String*>
-	Vector<String> data;
+	Vector<String*> data;
+	int currentDataIndex = -1;
 
 	//for adding simple strings (one string)
-	void initString(const String& str){
+	void initString(String* str){
 		data.clear();
 		data.add(str);
 	}
 
-	void addValue(String val) {
+	void addValue(String *val) {
 		data.add(val);
 	}
 
@@ -30,18 +31,34 @@ struct paramDataValues {
 	void initChars(int start, int end) {
 		data.clear();
 		for (int i = 0;  i < (end-start); ++i) {
-			data.add(String(i));
+			data.add(new String(i));
 		}
 	}
 
 	//only the first (one) value)
-	String getFirstValue(int index) {
+	String* getFirstValue(int index) {
 		return data.elementAt(index);
+	}
+
+	String* getNextData() {
+		if (data.size() == 0)
+			return null;
+		debugf("11");
+		int tmp = currentDataIndex;
+		debugf("12 - currentindex=%i", tmp);
+		tmp++;
+		if (tmp >= data.size()) {
+			tmp = 0;
+			debugf("13 - %d", tmp);
+		}
+		currentDataIndex = tmp;
+		debugf("14- currentDataIndex %d", currentDataIndex);
+		return data.elementAt(currentDataIndex);
 	}
 
 	//get all values
 	//TODO:ilan maybe clone the vector
-	Vector<String> getAllValues() {
+	Vector<String*> getAllValues() {
 		return data;
 	}
 };
@@ -54,7 +71,6 @@ struct paramData {
 	bool dirty = false;
 	String val;
 	bool editable = false;
-	Vector<String*> values;
 
 	void update(String newVal) {
 		val = newVal;
@@ -302,7 +318,7 @@ class InfoScreens : public BaseInfoElement{
 private:
 	Vector<InfoPage*> mChildern;
 	HashMap<String, paramData> paramValueMap;
-	HashMap<String, paramDataValues> paramEditValueMap;
+	HashMap<String, paramDataValues*> paramEditValueMap;
 
 	bool updateDisplay = false;
 	bool internalCanUpdateDisplay = true;
@@ -347,7 +363,7 @@ public:
 		return paramValueMap[id];
 	}
 
-	void setEditModeValues(String id, paramDataValues values);
+	void setEditModeValues(String id, paramDataValues* values);
 	void updateParamValue(String id, String newData); //no screen update
 	void setCanUpdateDisplay(bool newState);
 	bool canUpdateDisplay();

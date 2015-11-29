@@ -233,7 +233,7 @@ void InfoScreens::addPage(InfoPage* page) {
 	mChildern.add(page);
 }
 
-void InfoScreens::setEditModeValues(String id, paramDataValues values){
+void InfoScreens::setEditModeValues(String id, paramDataValues* values){
 	paramEditValueMap[id] = values;
 }
 
@@ -278,7 +278,7 @@ void InfoScreens::setViewMode(ViewMode mode) {
 //		moveToNextEditParam();
 	}
 	else if(mode == ViewMode::EDIT_FIELD) {
-		btn.enablePressAndHold(false);
+		btn.enablePressAndHold(true);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editFieldModeBtnClicked, this));
 //		moveToNextEditParam();
 	}
@@ -357,8 +357,12 @@ paramStruct* InfoScreens::moveToNextEditParam(){
 
 String InfoScreens::moveToNextValue() {
 	String ret;
-	paramDataValues data =  paramEditValueMap[getCurrent()->getCurrentEditParam()->id];
-
+	String id = getCurrent()->getCurrentEditParam()->id;
+	debugf("InfoScreens::moveToNextValue %s, %s", id.c_str());
+	paramDataValues* data =  paramEditValueMap[id];
+	String* d = data->getNextData();
+	updateParamValue(id, *d);
+	debugf("next data for %s, %s", id.c_str(), d->c_str());
 	return ret;
 }
 

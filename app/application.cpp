@@ -44,9 +44,10 @@ void initInfoScreens() {
 
 	paramStruct* ps1 = p1->createLine("ID: ")->addParam("ssid", "Edit Me", true, 6);
 
-	paramDataValues ssidVals;
-	ssidVals.addValue("s1");
-	ssidVals.addValue("s2");
+	paramDataValues* ssidVals = new paramDataValues();
+
+	ssidVals->addValue(new String("s1"));
+	ssidVals->addValue(new String("s2"));
 	infos->setEditModeValues("ssid", ssidVals);
 
 	p1->createLine("time:")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
