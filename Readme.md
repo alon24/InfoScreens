@@ -66,7 +66,7 @@ infos = new InfoScreens(&display, BTN_PIN);
 paramStruct* ps1 = p1->createLine("ID: ")->addParam("ssid", "Edit Me", true, 6);
 ```
 
-### Show the menu
+### Show the InfoScreen
 ```
 infos->show();
 ```
@@ -85,7 +85,7 @@ infos->moveRight();
 infos->moveLeft();
 ```
 
-### Use of InfoScreen
+### Buttons action handling in InfoScreen (different modes)
 
 #### In info mode
 **Click** - move to next Screen </br>
@@ -99,7 +99,8 @@ infos->moveLeft();
 **DoubleClick** - return to global edit mode (not just this field)
 **Click and hold** - Rapid fore (100ms) of move to next field value
 \*A small F will blink
-#### MultiFunctionButton
+</br>
+### MultiFunctionButton
 This button implementation can sense:
 
 1. **Click**
@@ -120,12 +121,15 @@ MultiFunctionButton() </br>
 MultiFunctionButton(int buttonPin, ButtonActionDelegate handler = null, bool pressAndHold = true)</br>
 
 #### Important functions
-```
+
 // init to set button, handler is optional here
 void initBtn(int buttonPin, ButtonActionDelegate handler = null, bool pressAndHold = true)
+
+//set how to handle long press
 void enablePressAndHold(bool pressAndHold)
+
+
 //Delegated call when event is triggered
 void setOnButtonEvent(ButtonActionDelegate handler)
-```
 
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/Kv1fsxQzNcM/0.jpg)](https://www.youtube.com/watch?v=Kv1fsxQzNcMo)
