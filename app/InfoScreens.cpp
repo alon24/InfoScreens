@@ -274,7 +274,7 @@ void InfoScreens::setViewMode(ViewMode mode) {
 	} else if(mode == ViewMode::EDIT){
 		btn.enablePressAndHold(false);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
-//		showEditParam();
+		showEditParam();
 //		moveToNextEditParam();
 	}
 	else if(mode == ViewMode::EDIT_FIELD) {
