@@ -69,12 +69,21 @@ struct paramDataValues {
 
 struct paramData {
 	bool dirty = false;
-	String val;
+	String* val = NULL;
 	bool editable = false;
 
-	void update(String newVal) {
-		val = newVal;
+	void update(const String& newVal) {
+//		debugf("start mem %d",system_get_free_heap_size());
+//		debugf("paramData:update %s", newVal.c_str());
+		if (val) {
+//			debugf("ff");
+			delete(val);
+		}
+//		debugf("bef");
+		val = new String(newVal);
+//		debugf("aft");
 		dirty = true;
+//			debugf("end mem %d",system_get_free_heap_size());
 	}
 
 	void clearDirty() {
@@ -98,6 +107,11 @@ struct paramStruct{
 		this->id = id;
 		this->t = t;
 		this->editable = edit;
+	}
+
+	paramStruct* setEditable(bool state) {
+		this->editable = state;
+		return this;
 	}
 };
 
@@ -150,7 +164,7 @@ public:
 	int mX, mY, mWidth;
 	int getTextSize();
 	String getText();
-	paramStruct* addParam(String id, String text, bool editable = false, int maxLineSize = -1);
+	paramStruct* addParam(String id, String text ="", bool editable = false, int maxLineSize = -1);
 //	paramStruct* addParam(String id, String text, textRect initial);
 
 	bool isEditable();
@@ -171,7 +185,6 @@ private:
 	bool editable = false;
 	int currentEditedParam = -1;
 	Vector<paramStruct> params;
-
 
 public:
 	InfoPage(String header) : BaseInfoElement() {
@@ -356,7 +369,7 @@ public:
 	InfoPage* get(int index);
 
 	InfoPage* getCurrent() {
-		return mChildern.get(paramValueMap["currentPage"].val.toInt());
+		return mChildern.get(paramValueMap["currentPage"].val->toInt());
 	}
 
 	paramData getParamText(String id) {

@@ -40,15 +40,14 @@ void initInfoScreens() {
 	el3->addParam("ap", "0.0.0.0");
 
 	InfoLine* el4 = p1->createLine("sta:");
-	el4->addParam("station", "0.0.0.0", true,6);
-
-	paramStruct* ps1 = p1->createLine("ID: ")->addParam("ssid", "Edit Me", true, 6);
+	el4->addParam("station", "Editfff", true, 6);
 
 	paramDataValues* ssidVals = new paramDataValues();
-
 	ssidVals->addValue(new String("s1"));
 	ssidVals->addValue(new String("s2"));
-	infos->setEditModeValues("ssid", ssidVals);
+	infos->setEditModeValues("station", ssidVals);
+
+	paramStruct* ps1 = p1->createLine("ID: ")->addParam("ssid", "No Vals", true, 6);
 
 	p1->createLine("time:")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 
@@ -57,13 +56,13 @@ void initInfoScreens() {
 	//add the time param
 	el2->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 
-	p2->createLine("sta:")->addParam("station", "0.0.0.0");
+	p2->createLine("sta:")->addParam("station")->setEditable(true);
 	InfoLine* el22 = p2->createLine("apdd: ");
-	el22->addParam("ap", "0.0.0.0");
+	el22->addParam("ap");
 
 	InfoPage* p3 = infos->createPage("P3");
 	p3->createLine("P3Test")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
-	p3->createLine("ap:")->addParam("ap", "0.0.0.0");
+	p3->createLine("ap:")->addParam("ap");
 	p3->createLine("editable")->addParam("aa", "edit-me", true, 6);
 }
 

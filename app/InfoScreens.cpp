@@ -96,7 +96,7 @@ void InfoLine::print()
 			this->display->setCursor(param->t.x, y);
 //			debugf("print,3.3.55 - %i", s);
 		}
-		textRect* t = this->display->print(str.val);
+		textRect* t = this->display->print(*str.val);
 		str.clearDirty();
 		param->t.x = t->x;
 		param->t.y = t->y;
@@ -296,7 +296,7 @@ void InfoScreens::moveRight() {
 	}
 
 ////		debugf("moveRight mills=%lu", lastUpdateTime);
-	int current = paramValueMap["currentPage"].val.toInt();
+	int current = paramValueMap["currentPage"].val->toInt();
 
 //		debugf("moveRight mCurrent=%i" , current);
 	if (current + 1 < mChildern.size()) {
@@ -314,7 +314,7 @@ void InfoScreens::moveLeft() {
 	if (mChildern.size() == 1) {
 		return;
 	}
-	int current = paramValueMap["currentPage"].val.toInt();
+	int current = paramValueMap["currentPage"].val->toInt();
 //		debugf("moveLeft mCurrent=%i" , current);
 
 	if (current - 1 >= 0) {
@@ -382,7 +382,7 @@ void InfoScreens::handleScreenUpdateTimer() {
 //				debugf("currentPage = %i, paramValueMap['currentPage'].dirty= %d",paramValueMap["currentPage"].val.toInt(), (int)paramValueMap["currentPage"].dirty);
 			display->clearDisplay();
 			display->setCursor(0,0);
-			print(paramValueMap["currentPage"].val.toInt());
+			print(paramValueMap["currentPage"].val->toInt());
 			paramValueMap["currentPage"].clearDirty();
 		}
 		else {
@@ -405,7 +405,7 @@ void InfoScreens::handleScreenUpdateTimer() {
 				paramStruct* param = params.get(i);
 				if (tempIds.contains(param->id)) {
 //						debugf("updating param %s", param->id.c_str());
-					display->writeover(param->t, paramValueMap[param->id].val);
+					display->writeover(param->t, *paramValueMap[param->id].val);
 					updated = true;
 				}
 			}
@@ -558,6 +558,7 @@ void InfoScreens::setCurrent(int index) {
 //		}
 	debugf("setCurrent-cur=%i", index);
 	if (paramValueMap.contains("currentPage")) {
+		debugf("InfoScreens::setCurrent");
 		paramValueMap["currentPage"].update(String(index));
 	}
 	else {
