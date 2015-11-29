@@ -355,6 +355,7 @@ public:
 	void setViewMode(ViewMode mode);
 	bool checkEditModeAvailble();
 	paramStruct* moveToNextEditParam();
+	paramStruct* showEditParam();
 	String moveToNextValue();
 
 	void infoModeBtnClicked(MultiFunctionButtonAction event);

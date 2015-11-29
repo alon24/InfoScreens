@@ -169,7 +169,7 @@ paramStruct* InfoPage::getCurrentEditParam(){
 	if (currentEditedParam == -1) {
 		return NULL;
 	}
-
+//	debugf("current edit param = %d", currentEditedParam);
 	Vector<paramStruct*> v = getallEditableParams();
 	return v.elementAt(currentEditedParam);
 }
@@ -272,9 +272,10 @@ void InfoScreens::setViewMode(ViewMode mode) {
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 
 	} else if(mode == ViewMode::EDIT){
-		btn.enablePressAndHold(true);
+		btn.enablePressAndHold(false);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
-		moveToNextEditParam();
+//		showEditParam();
+//		moveToNextEditParam();
 	}
 	else if(mode == ViewMode::EDIT_FIELD) {
 		btn.enablePressAndHold(false);
@@ -333,6 +334,17 @@ InfoPage* InfoScreens::get(int index) {
 		return mChildern.get(index);
 	}
 	return NULL;
+}
+
+paramStruct* InfoScreens::showEditParam(){
+//	editModeBlinkInfo.setLastSelected(getCurrent()->getCurrentEditParam());
+//	paramStruct* ret = getCurrent()->movetoNextEditParam();
+	paramStruct* ret = getCurrent()->getCurrentEditParam();
+	if (ret == NULL) {
+		ret = getCurrent()->movetoNextEditParam();
+	}
+	editModeBlinkInfo.reset();
+	return ret;
 }
 
 paramStruct* InfoScreens::moveToNextEditParam(){
@@ -404,19 +416,26 @@ void InfoScreens::handleScreenUpdateTimer() {
 			}
 
 			long current = millis();
-			int color = BLACK;
+			int linecolor = BLACK;
+			int symbleColor = BLACK;
 			editModeBlinkInfo.handleTimeElapsed(current);
 
-			if (viewMode == ViewMode::EDIT) {
+			if (viewMode == ViewMode::EDIT || viewMode == ViewMode::EDIT_FIELD) {
 				if (editModeBlinkInfo.blinkDrawn) {
-					color = WHITE;
+					linecolor = WHITE;
+					symbleColor = WHITE;
+					if (viewMode == ViewMode::EDIT_FIELD){
+//						linecolor = WHITE;
+					}
 				}
 
-				drawEditModeSign(124, 0, color);
+				drawEditModeSign(124, 0, symbleColor);
 				if (getCurrent()->getCurrentEditParam()) {
 					paramStruct* p = getCurrent()->getCurrentEditParam();
-					drawBlinkParamLine(p, color);
+					drawBlinkParamLine(p, linecolor);
 				}
+
+//				if
 			}
 		}
 	}
@@ -427,10 +446,22 @@ void InfoScreens::drawBlinkParamLine(paramStruct* p, int color){
 }
 
 void InfoScreens::drawEditModeSign(int x, int y, int color) {
-	display->drawFastHLine(x, y, 3, color);
-	display->drawFastHLine(x, y+2, 3, color);
-	display->drawFastHLine(x, y+4, 3, color);
-	display->drawFastVLine(x, y, y+4, color);
+	if (viewMode == ViewMode::EDIT) {
+		display->drawFastHLine(x, y, 3, color);
+		display->drawFastHLine(x, y+2, 3, color);
+		display->drawFastHLine(x, y+4, 3, color);
+		display->drawFastVLine(x, y, y+4, color);
+	} else {
+		display->drawFastHLine(x, y, 3, color);
+		display->drawFastHLine(x, y+2, 3, color);
+//		display->drawFastHLine(x, y+4, 3, color);
+		display->drawFastVLine(x, y, y+4, color);
+	}
+
+	//even if F mode clear the line
+	if (color== BLACK){
+		display->drawFastHLine(x, y+4, 3, color);
+	}
 }
 
 void InfoScreens::print(int pIndex) {
@@ -475,8 +506,8 @@ void InfoScreens::editModeBtnClicked(MultiFunctionButtonAction event)
 			break;
 		case BTN_DOUBLE_CLICK:
 			debugf("return to View mode");
-//			setViewMode(ViewMode::INFO);
-//			show();
+			setViewMode(ViewMode::INFO);
+			show();
 //			moveLeft();
 //				handleDoubleClick();
 			break;
