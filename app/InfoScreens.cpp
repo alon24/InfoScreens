@@ -491,7 +491,11 @@ void InfoScreens::handleScreenUpdateTimer() {
 				paramStruct* param = params.get(i);
 				if (tempIds.contains(param->id)) {
 //						debugf("updating param %s", param->id.c_str());
-					display->writeover(param->t, *paramValueMap[param->id].val);
+					int inverse = false;
+					if(viewMode == ViewMode::EDIT_FIELD && param->editable) {
+						inverse = true;
+					}
+					display->writeover(param->t, *paramValueMap[param->id].val, inverse);
 					updated = true;
 				}
 			}
@@ -522,6 +526,20 @@ void InfoScreens::handleScreenUpdateTimer() {
 				drawEditModeSign(124, 0, symbleColor);
 				if (getCurrent()->getCurrentEditParam()) {
 					paramStruct* p = getCurrent()->getCurrentEditParam();
+					int extraW = (p->maxSize) - p->t.w;
+//					debugf("extraw = %i",extraW);
+					if (viewMode == ViewMode::EDIT_FIELD) {
+						display->writeover(p->t, *paramValueMap[p->id].val, true);
+						if (extraW >0) {
+							display->fillRect(p->t.x + p->t.w, p->t.y, extraW, p->t.h, WHITE);
+						}
+					} else {
+						display->writeover(p->t, *paramValueMap[p->id].val);
+						if (extraW >0) {
+							display->fillRect(p->t.x + p->t.w, p->t.y, extraW, p->t.h, BLACK);
+						}
+					}
+
 					drawBlinkParamLine(p, linecolor);
 				}
 

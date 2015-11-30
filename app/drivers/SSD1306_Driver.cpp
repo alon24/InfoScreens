@@ -39,11 +39,15 @@ textRect* SSD1306_Driver::print(const String &s){
 	return t;
 }
 
-void SSD1306_Driver::printToLoc(const String &s, textRect &t){
+void SSD1306_Driver::printToLoc(const String &s, textRect &t, int color){
 	setCursor(t.x, t.y);
 //	uint32_t free = system_get_free_heap_size();
 //	int ff = (int)free;
 //	Serial.printf("free printToLoc= %i", ff );
+
+	int tempTextColor = textcolor;
+	setTextColor(color);
+
 	textRect* newt = this->print(s);
 	t.x = newt->x;
 	t.y = newt->y;
@@ -51,14 +55,23 @@ void SSD1306_Driver::printToLoc(const String &s, textRect &t){
 	t.w = newt->w;
 
 	delete(newt);
+
+	setTextColor(tempTextColor);
 //	free = system_get_free_heap_size();
 //	ff = (int)free;
 //	Serial.printf(", 2= %i\n", ff );
 }
 
-void SSD1306_Driver::writeover(textRect &orig, const String &s) {
-	this->fillRect( orig.x, orig.y, orig.w, orig.h, BLACK);
-	this->printToLoc(s, orig);
+void SSD1306_Driver::writeover(textRect &orig, const String &s, bool inverse) {
+	int textColor = WHITE;
+	int bkColor = BLACK;
+	if (inverse) {
+		textColor = BLACK;
+		bkColor = WHITE;
+	}
+
+	this->fillRect( orig.x, orig.y, orig.w, orig.h, bkColor);
+	this->printToLoc(s, orig, textColor);
 }
 
 textRect* SSD1306_Driver::getCurrentRect() {
