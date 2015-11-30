@@ -30,6 +30,11 @@ void blink()
 	state = !state;
 }
 
+bool menuEventLister(paramStruct* data, ViewMode vddd, InfoScreenMenuAction actionType, String newValue) {
+	debugf("menuEventLister received viewmode=%i, actiontype=%i, newVal=%s", vddd, actionType, newValue.c_str());
+	return true;
+}
+
 void initInfoScreens() {
 	InfoPage* p1 = infos->createPage("Main");
 	InfoLine* el = p1->createLine("P1Test");
@@ -64,6 +69,8 @@ void initInfoScreens() {
 	p3->createLine("P3Test")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 	p3->createLine("ap:")->addParam("ap");
 	p3->createLine("editable")->addParam("aa", "edit-me", true, 6);
+
+	infos->setOnMenuEventDelegate(menuEventLister);
 }
 
 void handleUpdateTimer() {

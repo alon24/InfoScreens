@@ -49,7 +49,11 @@ paramStruct* InfoLine::addParam(String id, String text, bool editable, int maxLi
 {
 	paramStruct* ret = new paramStruct();
 //	getParent()->updateParamValue(id, text);
-	updateParamValue(id, text);
+	if( text == "") {
+	} else {
+		updateParamValue(id, text);
+	}
+
 //	ret->text = text;
 	ret->t.x = -1;
 	ret->t.y = -1;
@@ -138,6 +142,18 @@ void InfoLine::updateParamValue(String id, String newData) {
 	getParent()->updateParamValue(id, newData);
 }
 
+InfoLine* InfoPage::createLine(String text) {
+	InfoLine* el =  new InfoLine(text, 1);
+	el->setParent(this);
+	el->setDisplay(&*display);
+	addElemenet(el);
+	return el;
+}
+
+void InfoPage::setEditable(bool editable) {
+	this->editable = editable;
+}
+
 Vector<paramStruct*> InfoPage::getAllParamsInPage() {
 	Vector<paramStruct*> ret;
 	for (int i = 0; i < mChildren.size(); ++i) {
@@ -182,6 +198,38 @@ paramStruct* InfoPage::movetoNextEditParam(){
 	}
 	debugf("getNextEditParam next param is %i", currentEditedParam);
 	return v.get(currentEditedParam);
+}
+
+void  InfoPage::initEdit() {
+	currentEditedParam = -1;
+}
+
+void InfoPage::addElemenet(InfoLine* el){
+	el->setParent(this);
+	el->setDisplay(&*display);
+	mChildren.add(el);
+};
+
+InfoLine* InfoPage::itemAt(int index) {
+	return mChildren.get(index);
+};
+
+Vector<InfoLine*> InfoPage::getItems()
+{
+	return mChildren;
+};
+
+Vector<paramStruct*> InfoPage::getAllParamsForId(String id) {
+	Vector<paramStruct*> ret;
+	for (int i = 0; i < mChildren.size(); ++i) {
+		InfoLine* l = mChildren.elementAt(i);
+		paramStruct* p = l->getParamById(id);
+		if ( p != NULL) {
+			ret.add(p);
+		}
+	}
+
+	return ret;
 }
 
 bool InfoPage::checkEditModeAvailble(){
@@ -231,6 +279,21 @@ void InfoScreens::addPage(InfoPage* page) {
 	page->setParent(this);
 	page->setDisplay(&*display);
 	mChildern.add(page);
+}
+
+void InfoScreens::show() {
+//		lastUpdateTime = millis();
+	setCanUpdateDisplay(false);
+	display->clearDisplay();
+	display->display();
+	paramValueMap["currentPage"].dirty = true;
+	setCanUpdateDisplay(true);
+}
+
+void InfoScreens::show(int pNum) {
+	setCurrent(pNum);
+//		debugf("show:%i", pNum);
+	show();
 }
 
 void InfoScreens::setEditModeValues(String id, paramDataValues* values){
@@ -336,6 +399,14 @@ InfoPage* InfoScreens::get(int index) {
 	return NULL;
 }
 
+InfoPage* InfoScreens::getCurrent() {
+	return mChildern.get(paramValueMap["currentPage"].val->toInt());
+}
+
+paramData InfoScreens::getParamText(String id) {
+	return paramValueMap[id];
+}
+
 paramStruct* InfoScreens::showEditParam(){
 //	editModeBlinkInfo.setLastSelected(getCurrent()->getCurrentEditParam());
 //	paramStruct* ret = getCurrent()->movetoNextEditParam();
@@ -350,6 +421,13 @@ paramStruct* InfoScreens::showEditParam(){
 paramStruct* InfoScreens::moveToNextEditParam(){
 	editModeBlinkInfo.setLastSelected(getCurrent()->getCurrentEditParam());
 //	editModeInfo.setLastSelected(getCurrent()->getCurrentEditParam());
+
+	if(delegatedMenuEvent) {
+		if (delegatedMenuEvent(getCurrent()->getCurrentEditParam(), viewMode, InfoNextParam, "")) {
+			debugf("moveToNextEditParam delegate consumed");
+		}
+	}
+
 	paramStruct* ret = getCurrent()->movetoNextEditParam();
 	editModeBlinkInfo.reset();
 	return ret;
@@ -357,10 +435,18 @@ paramStruct* InfoScreens::moveToNextEditParam(){
 
 String InfoScreens::moveToNextValue() {
 	String ret;
-	String id = getCurrent()->getCurrentEditParam()->id;
+	paramStruct* param = getCurrent()->getCurrentEditParam();
+	String id = param->id;
+
 	debugf("InfoScreens::moveToNextValue %s, %s", id.c_str());
 	paramDataValues* data =  paramEditValueMap[id];
 	String* d = data->getNextData();
+	if(delegatedMenuEvent) {
+		if (delegatedMenuEvent(param, viewMode, InfoNextValue, *d)) {
+			debugf("moveToNextValue delegate consumed");
+		}
+	}
+
 	updateParamValue(id, *d);
 	debugf("next data for %s, %s", id.c_str(), d->c_str());
 	return ret;
@@ -490,8 +576,11 @@ void InfoScreens::infoModeBtnClicked(MultiFunctionButtonAction event)
 			moveLeft();
 			break;
 		case BTN_LONG_CLICK:
-			debugf("BTN_LONG_CLICK, going to edit mode");
-			setViewMode(ViewMode::EDIT);
+			debugf("BTN_LONG_CLICK, going to edit mode, %i", getCurrent()->getallEditableParams().size());
+
+			if(getCurrent()->getallEditableParams().size() != 0) {
+				setViewMode(ViewMode::EDIT);
+			}
 			break;
 		case BTN_HOLD_CLICK:
 			debugf("BTN_HOLD_CLICK, going to edit mode");
@@ -532,30 +621,26 @@ void InfoScreens::editFieldModeBtnClicked(MultiFunctionButtonAction event)
 		case BTN_CLICK:
 			debugf("editField - click");
 			moveToNextValue();
-//			moveRight();
-//				handleClick();
 			break;
 		case BTN_DOUBLE_CLICK:
 			debugf("editField - return to View mode");
+			if(delegatedMenuEvent) {
+				String id = getCurrent()->getCurrentEditParam()->id;
+				String newVal = *paramValueMap[id].val;
+				if (delegatedMenuEvent(getCurrent()->getCurrentEditParam(), viewMode, InfoParamDataSet, newVal)) {
+					debugf("InfoParamDataSet delegate consumed");
+				}
+			}
 			setViewMode(ViewMode::EDIT);
-//			show();
-//			moveLeft();
-//				handleDoubleClick();
 			break;
-//		case BTN_LONG_CLICK:
-//			debugf("edit - BTN_LONG_CLICK");
-////				handleHoldClick();
-//			break;
-//		case BTN_HOLD_CLICK:
-//			debugf("BTN_HOLD_CLICK");
-//			break;
 	}
 }
 
+void InfoScreens::setOnMenuEventDelegate(MenuEventDelegate handler) {
+	delegatedMenuEvent  = handler;
+}
+
 void InfoScreens::setCurrent(int index) {
-//		if (index >= mChildern.size()) {
-//			return;
-//		}
 	debugf("setCurrent-cur=%i", index);
 	if (paramValueMap.contains("currentPage")) {
 		debugf("InfoScreens::setCurrent");
@@ -567,5 +652,4 @@ void InfoScreens::setCurrent(int index) {
 //			debugf("setCurrent - new param -cur= %i, %s",index, String(index).c_str());
 		paramValueMap["currentPage"] = p;
 	}
-//		mCurrent = index;
 }

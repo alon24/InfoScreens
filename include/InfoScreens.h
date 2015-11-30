@@ -195,53 +195,17 @@ public:
 	/**
 	 * creates and adds to parent
 	 */
-	InfoLine* createLine(String text) {
-		InfoLine* el =  new InfoLine(text, 1);
-		el->setParent(this);
-		el->setDisplay(&*display);
-		addElemenet(el);
-		return el;
-	}
-
-	void setEditable(bool editable) {
-		this->editable = editable;
-	}
+	InfoLine* createLine(String text);
+	void setEditable(bool editable);
 
 	paramStruct* getCurrentEditParam();
 	paramStruct* movetoNextEditParam();
 
-	void initEdit() {
-		currentEditedParam = -1;
-	}
-
-	void addElemenet(InfoLine* el){
-		el->setParent(this);
-		el->setDisplay(&*display);
-		mChildren.add(el);
-	};
-
-	InfoLine* itemAt(int index) {
-		return mChildren.get(index);
-	};
-
-	Vector<InfoLine*> getItems()
-	{
-		return mChildren;
-	};
-
-	Vector<paramStruct*> getAllParamsForId(String id) {
-		Vector<paramStruct*> ret;
-		for (int i = 0; i < mChildren.size(); ++i) {
-			InfoLine* l = mChildren.elementAt(i);
-			paramStruct* p = l->getParamById(id);
-			if ( p != NULL) {
-				ret.add(p);
-			}
-		}
-
-		return ret;
-	}
-
+	void initEdit();
+	void addElemenet(InfoLine* el);
+	InfoLine* itemAt(int index);
+	Vector<InfoLine*> getItems();
+	Vector<paramStruct*> getAllParamsForId(String id);
 	Vector<paramStruct*> getAllParamsInPage();
 	Vector<paramStruct*> getallEditableParams();
 
@@ -326,6 +290,13 @@ struct EditModeBlinkingInfo{
 	paramStruct* lastSelectedParam = NULL;
 };
 
+enum InfoScreenMenuAction { InfoParamDataSet = 0, InfoNextValue = 1, InfoNextParam =2};
+/**
+ * Delegate for menu handling before change is done.
+ * the return value represents consumeable
+ */
+typedef Delegate<bool(paramStruct* data, ViewMode v, InfoScreenMenuAction actionType, String newValue)> MenuEventDelegate;
+
 class InfoScreens : public BaseInfoElement{
 
 private:
@@ -343,39 +314,20 @@ private:
 	MultiFunctionButton btn;
 	ViewMode viewMode = ViewMode::INFO;
 
+	MenuEventDelegate delegatedMenuEvent;
 	EditModeBlinkingInfo editModeBlinkInfo;
 public:
 
 	InfoScreens(SSD1306_Driver *dis, int btnPin);
 	InfoPage* createPage(String header);
 	void addPage(InfoPage* page);
-	void show() {
-//		lastUpdateTime = millis();
-		setCanUpdateDisplay(false);
-		display->clearDisplay();
-		display->display();
-		paramValueMap["currentPage"].dirty = true;
-		setCanUpdateDisplay(true);
-	}
-
-	void show(int pNum) {
-		setCurrent(pNum);
-//		debugf("show:%i", pNum);
-		show();
-	}
-
+	void show();
+	void show(int pNum);
 	void moveRight();
 	void moveLeft();
 	InfoPage* get(int index);
-
-	InfoPage* getCurrent() {
-		return mChildern.get(paramValueMap["currentPage"].val->toInt());
-	}
-
-	paramData getParamText(String id) {
-		return paramValueMap[id];
-	}
-
+	InfoPage* getCurrent();
+	paramData getParamText(String id);
 	void setEditModeValues(String id, paramDataValues* values);
 	void updateParamValue(String id, String newData); //no screen update
 	void setCanUpdateDisplay(bool newState);
@@ -390,6 +342,8 @@ public:
 	void infoModeBtnClicked(MultiFunctionButtonAction event);
 	void editModeBtnClicked(MultiFunctionButtonAction event);
 	void editFieldModeBtnClicked(MultiFunctionButtonAction event);
+	void setOnMenuEventDelegate(MenuEventDelegate handler);
+
 private:
 	void handleScreenUpdateTimer();
 	void print(int pIndex);
