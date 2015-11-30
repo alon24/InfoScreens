@@ -546,6 +546,7 @@ void InfoScreens::drawEditModeSign(int x, int y, int color) {
 		display->drawFastHLine(x, y+2, 3, color);
 //		display->drawFastHLine(x, y+4, 3, color);
 		display->drawFastVLine(x, y, y+4, color);
+		display->drawPixel(x, y+4, color);
 	}
 
 	//even if F mode clear the line
