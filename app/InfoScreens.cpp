@@ -425,6 +425,7 @@ paramStruct* InfoScreens::moveToNextEditParam(){
 	if(delegatedMenuEvent) {
 		if (delegatedMenuEvent(getCurrent()->getCurrentEditParam(), viewMode, InfoNextParam, "")) {
 			debugf("moveToNextEditParam delegate consumed");
+			return NULL;
 		}
 	}
 	paramStruct* ret = getCurrent()->movetoNextEditParam();
@@ -441,7 +442,15 @@ String InfoScreens::moveToNextValue() {
 
 //	debugf("InfoScreens::moveToNextValue %s, %s", id.c_str());
 	if (!paramEditValueMap.contains(id)) {
-		debugf("no more data");
+		if(delegatedMenuEvent) {
+			if (delegatedMenuEvent(param, viewMode, InfoNextValue, "")) {
+				debugf("moveToNextValue delegate consumed");
+			}
+			else {
+				debugf("no more data");
+			}
+		}
+
 		return ret;
 	}
 
@@ -453,6 +462,7 @@ String InfoScreens::moveToNextValue() {
 	if(delegatedMenuEvent) {
 		if (delegatedMenuEvent(param, viewMode, InfoNextValue, *d)) {
 			debugf("moveToNextValue delegate consumed");
+			return "";
 		}
 	}
 	updateParamValue(id, *d);
@@ -656,6 +666,7 @@ void InfoScreens::editFieldModeBtnClicked(MultiFunctionButtonAction event)
 				String newVal = *paramValueMap[id].val;
 				if (delegatedMenuEvent(getCurrent()->getCurrentEditParam(), viewMode, InfoParamDataSet, newVal)) {
 					debugf("InfoParamDataSet delegate consumed");
+					return;
 				}
 			}
 			setViewMode(ViewMode::EDIT);

@@ -30,9 +30,19 @@ void blink()
 	state = !state;
 }
 
+int dddd = 0;
 bool menuEventLister(paramStruct* data, ViewMode vddd, InfoScreenMenuAction actionType, String newValue) {
 	debugf("menuEventLister received viewmode=%i, actiontype=%i, newVal=%s", vddd, actionType, newValue.c_str());
-	return true;
+
+	if (data->id == "ssid" && actionType == InfoScreenMenuAction::InfoNextValue) {
+		infos->updateParamValue(data->id, "ilan" + String(dddd++));
+		if (dddd>10) {
+			dddd =0;
+		}
+		return true;
+	}
+
+	return false;
 }
 
 void initInfoScreens() {
