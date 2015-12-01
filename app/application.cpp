@@ -78,9 +78,8 @@ void initInfoScreens() {
 	InfoPage* p3 = infos->createPage("P3");
 	p3->createLine("P3Test")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 	p3->createLine("ap:")->addParam("ap");
-	p3->createLine("param1: ")->addParam("aa", "not edit");
-
-	infos->setOnMenuEventDelegate(menuEventLister);
+    p3->createLine("param1: ")->addParam("aa", "not edit");
+    infos->setOnMenuEventDelegate(menuEventLister);
 }
 
 void handleUpdateTimer() {
