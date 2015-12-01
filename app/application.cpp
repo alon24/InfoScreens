@@ -61,7 +61,7 @@ void initInfoScreens() {
 	//add the time param
 	el2->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 
-	p2->createLine("sta:")->addParam("station")->setEditable(true);
+	p2->createLine("sta:")->addParam("station")->setEditable(true)->setMaxLineSize(6);
 	InfoLine* el22 = p2->createLine("apdd: ");
 	el22->addParam("ap");
 
@@ -107,4 +107,5 @@ void init()
 
 	updater.initializeMs(300, handleUpdateTimer).start();
 	updater2.initializeMs(120, handle2UpdateTimer).start();
+
 }

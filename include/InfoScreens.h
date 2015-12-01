@@ -43,16 +43,13 @@ struct paramDataValues {
 	String* getNextData() {
 		if (data.size() == 0)
 			return null;
-		debugf("11");
+
 		int tmp = currentDataIndex;
-		debugf("12 - currentindex=%i", tmp);
 		tmp++;
 		if (tmp >= data.size()) {
 			tmp = 0;
-			debugf("13 - %d", tmp);
 		}
 		currentDataIndex = tmp;
-		debugf("14- currentDataIndex %d", currentDataIndex);
 		return data.elementAt(currentDataIndex);
 	}
 
@@ -109,9 +106,25 @@ struct paramStruct{
 		this->editable = edit;
 	}
 
+	/*
+	 * return this, for chaining commands
+	 */
 	paramStruct* setEditable(bool state) {
 		this->editable = state;
 		return this;
+	}
+
+	/*
+	 * return this, for chaining commands
+	 * @param size - in chars
+	 */
+	paramStruct* setMaxLineSize(int size) {
+		this->maxSize = size * 8;
+		return this;
+	}
+
+	String toString() {
+		return "id=" + id + ",x=" + String(t.x) + ",y=" + String(t.y);
 	}
 };
 

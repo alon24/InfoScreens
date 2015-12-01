@@ -28,7 +28,7 @@
  *
  *  added options to Hold and get click repeats (100ms)
  */
-enum MultiFunctionButtonAction { BTN_CLICK=1, BTN_DOUBLE_CLICK=2, BTN_LONG_CLICK=3, BTN_HOLD_CLICK=4};
+enum MultiFunctionButtonAction { BTN_CLICK=1, BTN_DOUBLE_CLICK=2, BTN_LONG_CLICK=3, BTN_HOLD_CLICK=4, BTN_TRIPPLE_CLICK=5};
 
 typedef Delegate<void(MultiFunctionButtonAction)> ButtonActionDelegate;
 
@@ -200,9 +200,12 @@ public:
 			case 4:
 				act = BTN_HOLD_CLICK;
 				break;
+			case 5:
+				act = BTN_TRIPPLE_CLICK;
+				break;
 		}
 
-		if ((b==1 || b==2 || b==3 || b==4) && delegatedActionEvent) {
+		if ((b==1 || b==2 || b==3 || b==4 || b==5) && delegatedActionEvent) {
 			delegatedActionEvent(act);
 		}
 	}
@@ -223,8 +226,11 @@ private:
 	boolean buttonVal = HIGH;   // value read from button
 	boolean buttonLast = HIGH; // buffered value of the button's previous state
 	boolean DCwaiting = false; // whether we're waiting for a double click (down)
+	boolean TCwaiting = false; // whether we're waiting for a tripple click (down)
 	boolean DConUp = false; // whether to register a double click on next release, or whether to wait and click
+	boolean TConUp = false; // whether to register a tripple click on next release, or whether to wait and click
 	boolean singleOK = true;    // whether it's OK to do a single click
+	boolean doubleOK = true;    // whether it's OK to do a double click
 	boolean ignoreUp = false; // whether to ignore the button release because the click+hold was triggered
 	boolean waitForUp = false; // when held, whether to wait for the up event
 	boolean holdEventPast = false; // whether or not the hold event happened already

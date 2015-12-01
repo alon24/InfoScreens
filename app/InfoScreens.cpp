@@ -427,7 +427,6 @@ paramStruct* InfoScreens::moveToNextEditParam(){
 			debugf("moveToNextEditParam delegate consumed");
 		}
 	}
-
 	paramStruct* ret = getCurrent()->movetoNextEditParam();
 	editModeBlinkInfo.reset();
 	return ret;
@@ -437,16 +436,25 @@ String InfoScreens::moveToNextValue() {
 	String ret;
 	paramStruct* param = getCurrent()->getCurrentEditParam();
 	String id = param->id;
+	//temp value
+	ret = *paramValueMap[param->id].val;
 
-	debugf("InfoScreens::moveToNextValue %s, %s", id.c_str());
+//	debugf("InfoScreens::moveToNextValue %s, %s", id.c_str());
+	if (!paramEditValueMap.contains(id)) {
+		debugf("no more data");
+		return ret;
+	}
+
 	paramDataValues* data =  paramEditValueMap[id];
+	if (data == NULL) {
+		debugf("data is null");
+	}
 	String* d = data->getNextData();
 	if(delegatedMenuEvent) {
 		if (delegatedMenuEvent(param, viewMode, InfoNextValue, *d)) {
 			debugf("moveToNextValue delegate consumed");
 		}
 	}
-
 	updateParamValue(id, *d);
 	debugf("next data for %s, %s", id.c_str(), d->c_str());
 	return ret;
@@ -524,8 +532,8 @@ void InfoScreens::handleScreenUpdateTimer() {
 				}
 
 				drawEditModeSign(124, 0, symbleColor);
-				if (getCurrent()->getCurrentEditParam()) {
-					paramStruct* p = getCurrent()->getCurrentEditParam();
+				paramStruct* p = getCurrent()->getCurrentEditParam();
+				if (p) {
 					int extraW = (p->maxSize) - p->t.w;
 //					debugf("extraw = %i",extraW);
 					if (viewMode == ViewMode::EDIT_FIELD) {
@@ -539,7 +547,7 @@ void InfoScreens::handleScreenUpdateTimer() {
 							display->fillRect(p->t.x + p->t.w, p->t.y, extraW, p->t.h, BLACK);
 						}
 					}
-
+//					debugf("linecolor = %i, currnet param %s", linecolor, getCurrent()->getCurrentEditParam()->toString().c_str() );
 					drawBlinkParamLine(p, linecolor);
 				}
 
