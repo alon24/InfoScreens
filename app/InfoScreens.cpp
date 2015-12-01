@@ -200,7 +200,7 @@ paramStruct* InfoPage::movetoNextEditParam(){
 	if (currentEditedParam>=v.size()){
 		currentEditedParam = 0;
 	}
-	debugf("getNextEditParam next param is %i", currentEditedParam);
+//	debugf("getNextEditParam next param is %i", currentEditedParam);
 	return v.get(currentEditedParam);
 }
 
@@ -454,7 +454,7 @@ paramStruct* InfoScreens::moveToNextEditParam(){
 
 	if(delegatedMenuEvent) {
 		if (delegatedMenuEvent(getCurrent()->getCurrentEditParam(), viewMode, InfoNextParam, "")) {
-			debugf("moveToNextEditParam delegate consumed");
+//			debugf("moveToNextEditParam delegate consumed");
 			return NULL;
 		}
 	}
@@ -474,7 +474,7 @@ String InfoScreens::moveToNextValue() {
 	if (!paramEditValueMap.contains(id)) {
 		if(delegatedMenuEvent) {
 			if (delegatedMenuEvent(param, viewMode, InfoNextValue, "")) {
-				debugf("moveToNextValue delegate consumed");
+//				debugf("moveToNextValue delegate consumed");
 			}
 			else {
 				debugf("no more data");
@@ -491,20 +491,18 @@ String InfoScreens::moveToNextValue() {
 	String* d = data->getNextData();
 	if(delegatedMenuEvent) {
 		if (delegatedMenuEvent(param, viewMode, InfoNextValue, *d)) {
-			debugf("moveToNextValue delegate consumed");
+//			debugf("moveToNextValue delegate consumed");
 			return "";
 		}
 	}
 	updateParamValue(id, *d);
-	debugf("next data for %s, %s", id.c_str(), d->c_str());
+//	debugf("next data for %s, %s", id.c_str(), d->c_str());
 	return ret;
 }
 
 //InfoScreeens private
 
 void InfoScreens::handleScreenUpdateTimer() {
-//		debugf("can updatedisplay=%i", canUpdateDisplay());
-
 	if(canUpdateDisplay() && internalCanUpdateDisplay) {
 		if (mChildern.size() == 0) {
 			debugf("I cannot print anything, no Pages declared, setting to NOT update display");
@@ -635,22 +633,22 @@ void InfoScreens::infoModeBtnClicked(MultiFunctionButtonAction event)
 {
 	switch (event) {
 		case BTN_CLICK:
-			debugf("click");
+//			debugf("click");
 			moveRight();
 			break;
 		case BTN_DOUBLE_CLICK:
-			debugf("BTN_DOUBLE_CLICK");
+//			debugf("BTN_DOUBLE_CLICK");
 			moveLeft();
 			break;
 		case BTN_LONG_CLICK:
-			debugf("BTN_LONG_CLICK, going to edit mode, %i", getCurrent()->getallEditableParams().size());
+//			debugf("BTN_LONG_CLICK, going to edit mode, %i", getCurrent()->getallEditableParams().size());
 
 			if(getCurrent()->getallEditableParams().size() != 0) {
 				setViewMode(ViewMode::EDIT);
 			}
 			break;
 		case BTN_HOLD_CLICK:
-			debugf("BTN_HOLD_CLICK, going to edit mode");
+//			debugf("BTN_HOLD_CLICK, going to edit mode");
 			break;
 	}
 }
@@ -665,14 +663,14 @@ void InfoScreens::editModeBtnClicked(MultiFunctionButtonAction event)
 //				handleClick();
 			break;
 		case BTN_DOUBLE_CLICK:
-			debugf("return to View mode");
+//			debugf("return to View mode");
 			setViewMode(ViewMode::INFO);
 			show();
 //			moveLeft();
 //				handleDoubleClick();
 			break;
 		case BTN_LONG_CLICK:
-			debugf("edit - BTN_LONG_CLICK");
+//			debugf("edit - BTN_LONG_CLICK");
 			setViewMode(ViewMode::EDIT_FIELD);
 //				handleHoldClick();
 			break;
@@ -686,16 +684,16 @@ void InfoScreens::editFieldModeBtnClicked(MultiFunctionButtonAction event)
 {
 	switch (event) {
 		case BTN_CLICK:
-			debugf("editField - click");
+//			debugf("editField - click");
 			moveToNextValue();
 			break;
 		case BTN_DOUBLE_CLICK:
-			debugf("editField - return to View mode");
+//			debugf("editField - return to View mode");
 			if(delegatedMenuEvent) {
 				String id = getCurrent()->getCurrentEditParam()->id;
 				String newVal = *paramValueMap[id].val;
 				if (delegatedMenuEvent(getCurrent()->getCurrentEditParam(), viewMode, InfoParamDataSet, newVal)) {
-					debugf("InfoParamDataSet delegate consumed");
+//					debugf("InfoParamDataSet delegate consumed");
 					return;
 				}
 			}
@@ -709,7 +707,7 @@ void InfoScreens::setOnMenuEventDelegate(MenuEventDelegate handler) {
 }
 
 void InfoScreens::setCurrent(int index) {
-	debugf("setCurrent-cur=%i", index);
+//	debugf("setCurrent-cur=%i", index);
 	if (paramValueMap.contains("currentPage")) {
 		debugf("InfoScreens::setCurrent");
 		paramValueMap["currentPage"].update(String(index));

@@ -31,8 +31,8 @@ void blink()
 }
 
 int counter = 0;
-bool menuEventLister(paramStruct* data, ViewMode vddd, InfoScreenMenuAction actionType, String newValue) {
-	debugf("menuEventLister received viewmode=%i, actiontype=%i, newVal=%s", vddd, actionType, newValue.c_str());
+bool menuEventLister(paramStruct* data, ViewMode vmode, InfoScreenMenuAction actionType, String newValue) {
+	debugf("menuEventLister received on id=%s, viewmode=%i, actiontype=%i, newVal=%s", data->id.c_str(), vmode, actionType, newValue.c_str());
 
 	if (data->id == "ssid" && actionType == InfoScreenMenuAction::InfoNextValue) {
 		infos->updateParamValue(data->id, "test" + String(counter++));
