@@ -30,14 +30,14 @@ void blink()
 	state = !state;
 }
 
-int dddd = 0;
+int counter = 0;
 bool menuEventLister(paramStruct* data, ViewMode vddd, InfoScreenMenuAction actionType, String newValue) {
 	debugf("menuEventLister received viewmode=%i, actiontype=%i, newVal=%s", vddd, actionType, newValue.c_str());
 
 	if (data->id == "ssid" && actionType == InfoScreenMenuAction::InfoNextValue) {
-		infos->updateParamValue(data->id, "test" + String(dddd++));
-		if (dddd>10) {
-			dddd =0;
+		infos->updateParamValue(data->id, "test" + String(counter++));
+		if (counter>10) {
+			counter =0;
 		}
 		return true;
 	}
@@ -78,7 +78,7 @@ void initInfoScreens() {
 	InfoPage* p3 = infos->createPage("P3");
 	p3->createLine("P3Test")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 	p3->createLine("ap:")->addParam("ap");
-	p3->createLine("editable")->addParam("aa", "edit-me", true, 6);
+	p3->createLine("param1: ")->addParam("aa", "not edit");
 
 	infos->setOnMenuEventDelegate(menuEventLister);
 }

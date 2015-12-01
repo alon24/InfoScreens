@@ -225,13 +225,6 @@ public:
 };
 
 typedef Delegate<void()> showScreenUpdateDelegate;
-//
-//enum class BtnMode {
-//	None = 0,
-//	Click = 1,
-//	DoubleClick = 2,
-//	ClickAndRun = 3
-//};
 
 enum class ViewMode {
 	INFO = 0,
@@ -290,7 +283,6 @@ private:
 	Timer screenUpdateTimer;
 	int btnPin=0;
 	long lastClickTime = 0;
-//	BtnMode btnMode = BtnMode::None;
 	int waitTimeForClick = 200;
 	MultiFunctionButton btn;
 	ViewMode viewMode = ViewMode::INFO;
