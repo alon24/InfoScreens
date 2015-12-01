@@ -142,6 +142,10 @@ void InfoLine::updateParamValue(String id, String newData) {
 	getParent()->updateParamValue(id, newData);
 }
 
+InfoPage::InfoPage(String header) : BaseInfoElement::BaseInfoElement() {
+	m_header = header;
+};
+
 InfoLine* InfoPage::createLine(String text) {
 	InfoLine* el =  new InfoLine(text, 1);
 	el->setParent(this);
@@ -244,6 +248,32 @@ bool InfoPage::checkEditModeAvailble(){
 
 void InfoPage::initEditMode() {
 	currentEditedParam = -1;
+}
+
+//No screen update
+void InfoPage::updateParamValue(String id, String newData) {
+	getParent()->updateParamValue(id, newData);
+}
+
+void InfoPage::print() {
+	display->clearDisplay();
+//		debugf("print,3.2 ");
+	display->setCursor(0,0);
+	for(int i=0; i< mChildren.size(); i++){
+//			debugf("print,3.3 - %i ", i);
+		InfoLine* child = mChildren.get(i);
+		child->print();
+//			debugf("print,3.4 - %i ", i);
+	}
+//		debugf("print,3.6 ");
+}
+
+bool InfoPage::canUpdateDisplay() {
+	return getParent()->canUpdateDisplay();
+}
+
+paramData InfoPage::getParamText(String id){
+	return parent->getParamText(id);
 }
 
 InfoScreens::InfoScreens(SSD1306_Driver *dis, int btnPin) : BaseInfoElement::BaseInfoElement()

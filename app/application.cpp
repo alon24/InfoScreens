@@ -35,7 +35,7 @@ bool menuEventLister(paramStruct* data, ViewMode vddd, InfoScreenMenuAction acti
 	debugf("menuEventLister received viewmode=%i, actiontype=%i, newVal=%s", vddd, actionType, newValue.c_str());
 
 	if (data->id == "ssid" && actionType == InfoScreenMenuAction::InfoNextValue) {
-		infos->updateParamValue(data->id, "ilan" + String(dddd++));
+		infos->updateParamValue(data->id, "test" + String(dddd++));
 		if (dddd>10) {
 			dddd =0;
 		}

@@ -200,15 +200,8 @@ private:
 	Vector<paramStruct> params;
 
 public:
-	InfoPage(String header) : BaseInfoElement() {
-//		setId(id);
-		m_header = header;
-	};
-
-	/**
-	 * creates and adds to parent
-	 */
-	InfoLine* createLine(String text);
+	InfoPage(String header);
+	InfoLine* createLine(String text); //creates and adds to parent
 	void setEditable(bool editable);
 
 	paramStruct* getCurrentEditParam();
@@ -222,48 +215,23 @@ public:
 	Vector<paramStruct*> getAllParamsInPage();
 	Vector<paramStruct*> getallEditableParams();
 
-	/**
-	 * check if there are params on page which are editable
-	 */
-	bool checkEditModeAvailble();
+	bool checkEditModeAvailble(); //check if there are params on page which are editable
 	void initEditMode();
-
 	//No screen update
-	void updateParamValue(String id, String newData) {
-		getParent()->updateParamValue(id, newData);
-	}
-
-	void print() {
-		display->clearDisplay();
-//		debugf("print,3.2 ");
-		display->setCursor(0,0);
-		for(int i=0; i< mChildren.size(); i++){
-//			debugf("print,3.3 - %i ", i);
-			InfoLine* child = mChildren.get(i);
-			child->print();
-//			debugf("print,3.4 - %i ", i);
-		}
-//		debugf("print,3.6 ");
-	}
-
-	bool canUpdateDisplay() {
-		return getParent()->canUpdateDisplay();
-	}
-
-	paramData getParamText(String id){
-		return parent->getParamText(id);
-	}
+	void updateParamValue(String id, String newData);
+	void print();
+	bool canUpdateDisplay();
+	paramData getParamText(String id);
 };
 
 typedef Delegate<void()> showScreenUpdateDelegate;
-//typedef Delegate<void()> btnUpdateDelegate;
-
-enum class BtnMode {
-	None = 0,
-	Click = 1,
-	DoubleClick = 2,
-	ClickAndRun = 3
-};
+//
+//enum class BtnMode {
+//	None = 0,
+//	Click = 1,
+//	DoubleClick = 2,
+//	ClickAndRun = 3
+//};
 
 enum class ViewMode {
 	INFO = 0,
@@ -322,7 +290,7 @@ private:
 	Timer screenUpdateTimer;
 	int btnPin=0;
 	long lastClickTime = 0;
-	BtnMode btnMode = BtnMode::None;
+//	BtnMode btnMode = BtnMode::None;
 	int waitTimeForClick = 200;
 	MultiFunctionButton btn;
 	ViewMode viewMode = ViewMode::INFO;
