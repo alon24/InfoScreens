@@ -161,7 +161,7 @@ If **enableClickAndHold = true** then if button is still pressed after click, it
 click event every 100ms
 
 if **enableClickAndHold = false** then lib will detect: </br>
-3. Long click - no Click events fired while key is kept down
+3. Long click - no Click events fired while key is kept down </br>
 4. Hold click - (longer interval) - no Click events fired while key is kept down
 
 ### Usage:
