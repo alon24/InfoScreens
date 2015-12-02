@@ -181,5 +181,3 @@ void enablePressAndHold(bool pressAndHold)
 
 //Delegated call when event is triggered </br>
 void setOnButtonEvent(ButtonActionDelegate handler)
-
-[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/Kv1fsxQzNcM/0.jpg)](https://www.youtube.com/watch?v=Kv1fsxQzNcMo)
