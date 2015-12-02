@@ -283,7 +283,7 @@ InfoScreens::InfoScreens(SSD1306_Driver *dis, int btnPin) : BaseInfoElement::Bas
 
 	this->btnPin = btnPin;
 	btn.initBtn(btnPin);
-	btn.enablePressAndHold(false);
+	btn.enableClickAndHold(false);
 	btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 
 	screenUpdateTimer.setCallback(showScreenUpdateDelegate(&InfoScreens::handleScreenUpdateTimer, this));
@@ -361,17 +361,17 @@ void InfoScreens::setViewMode(ViewMode mode) {
 
 	this->viewMode = mode;
 	if(mode == ViewMode::INFO) {
-		btn.enablePressAndHold(false);
+		btn.enableClickAndHold(false);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 
 	} else if(mode == ViewMode::EDIT){
-		btn.enablePressAndHold(false);
+		btn.enableClickAndHold(false);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
 		showEditParam();
 //		moveToNextEditParam();
 	}
 	else if(mode == ViewMode::EDIT_FIELD) {
-		btn.enablePressAndHold(true);
+		btn.enableClickAndHold(true);
 		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editFieldModeBtnClicked, this));
 //		moveToNextEditParam();
 	}

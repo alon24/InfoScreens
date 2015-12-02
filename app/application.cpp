@@ -8,12 +8,11 @@
 #define LED_PIN 2 // GPIO2
 #define BTN_PIN 0
 
-#define sclPin 5 //D2
-#define sdaPin 4 //D1
+#define sclPin 5
+#define sdaPin 4
 
 //* SSD1306 - I2C
 SSD1306_Driver display(4);
-//Adafruit_SSD1306 display(4);
 
 Timer procTimer;
 bool state = true;
@@ -24,12 +23,7 @@ String currentTime = "00:00:00";
 Timer updater;
 Timer updater2;
 
-void blink()
-{
-	digitalWrite(LED_PIN, state);
-	state = !state;
-}
-
+//Sample code to handle callbacks, and specifically target the "ssid" parameter which is dynamic
 int counter = 0;
 bool menuEventLister(paramStruct* data, ViewMode vmode, InfoScreenMenuAction actionType, String newValue) {
 	debugf("menuEventLister received on id=%s, viewmode=%i, actiontype=%i, newVal=%s", data->id.c_str(), vmode, actionType, newValue.c_str());
@@ -46,24 +40,33 @@ bool menuEventLister(paramStruct* data, ViewMode vmode, InfoScreenMenuAction act
 }
 
 void initInfoScreens() {
+	// Add a new Page
 	InfoPage* p1 = infos->createPage("Main");
+
+	//Add a line item
 	InfoLine* el = p1->createLine("P1Test");
-	//add the time param
+
+	//add a time parameter (data that can be updated whenever)
 	el->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 
 	InfoLine* el3 = p1->createLine("ap: ");
 	el3->addParam("ap", "0.0.0.0");
 
 	InfoLine* el4 = p1->createLine("sta:");
-	el4->addParam("station", "Editfff", true, 6);
+	el4->addParam("station", "EditXXX", true, 6);
 
-	paramDataValues* ssidVals = new paramDataValues();
-	ssidVals->addValue(new String("s1"));
-	ssidVals->addValue(new String("s2"));
-	infos->setEditModeValues("station", ssidVals);
+	//add a list of static Values
+	paramDataValues* stationVals = new paramDataValues();
+	stationVals->addValue(new String("s1"));
+	stationVals->addValue(new String("s2"));
 
+	//assign the values to the id=station parameter
+	infos->setEditModeValues("station", stationVals);
+
+	//add a new parameter without adding a list of parameter
 	paramStruct* ps1 = p1->createLine("ID: ")->addParam("ssid", "No Vals", true, 6);
 
+	//You can even add the same param more than 1 time in a page (short version now)
 	p1->createLine("time:")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 
 	InfoPage* p2 = infos->createPage("P2");
@@ -79,6 +82,8 @@ void initInfoScreens() {
 	p3->createLine("P3Test")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
 	p3->createLine("ap:")->addParam("ap");
     p3->createLine("param1: ")->addParam("aa", "not edit");
+
+    // set a function to get screen info callback (with the ability to consume events)
     infos->setOnMenuEventDelegate(menuEventLister);
 }
 
@@ -104,15 +109,9 @@ void init()
 	display.setTextSize(1);
 	display.setTextColor(WHITE);
 
-//	display.print("Testing display");
-//	display.display();
-
 	infos = new InfoScreens(&display, BTN_PIN);
 	initInfoScreens();
 	infos->show();
-
-//	pinMode(LED_PIN, OUTPUT);
-//	procTimer.initializeMs(1000, blink).start();
 
 	updater.initializeMs(300, handleUpdateTimer).start();
 	updater2.initializeMs(120, handle2UpdateTimer).start();

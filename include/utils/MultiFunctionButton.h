@@ -57,7 +57,7 @@ public:
 			buttonTimer.initializeMs(80, TimerDelegate(&MultiFunctionButton::actOnButton, this)).start();
 		}
 
-		enablePressAndHold(pressAndHold);
+		enableClickAndHold(pressAndHold);
 	};
 
 	// init to set button, handler is optional here
@@ -67,10 +67,10 @@ public:
 			setOnButtonEvent(handler);
 		}
 
-		enablePressAndHold(pressAndHold);
+		enableClickAndHold(pressAndHold);
 	}
 
-	void enablePressAndHold(bool pressAndHold) {
+	void enableClickAndHold(bool pressAndHold) {
 		this->pressAndHold = pressAndHold;
 	}
 
