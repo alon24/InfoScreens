@@ -281,7 +281,6 @@ InfoScreens::InfoScreens(SSD1306_Driver *dis, int btnPin) : BaseInfoElement::Bas
 	this->display = dis;
 	setCurrent(0);
 
-//	this->btnPin = btnPin;
 	btn.initBtn(btnPin);
 	btn.enableClickAndHold(false);
 	btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
@@ -305,19 +304,17 @@ InfoScreens::InfoScreens(SSD1306_Driver *dis) : BaseInfoElement::BaseInfoElement
 }
 
 void InfoScreens::initMFButton(int btnPin) {
-//	this->btnPin = btnPin;
 	btn.initBtn(btnPin);
 	btn.enableClickAndHold(false);
 	btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 }
 
 void InfoScreens::initRotary(int btnPin, int encoderCLK, int encoderDT) {
-//	this->btnPin = btnPin;
-//	Rotary
+	rotary.init(btnPin, encoderCLK, encoderDT);
 
-	btn.initBtn(btnPin);
-	btn.enableClickAndHold(false);
-	btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+//	btn.initBtn(btnPin);
+//	btn.enableClickAndHold(false);
+//	btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 
 }
 

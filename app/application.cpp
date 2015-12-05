@@ -11,6 +11,10 @@
 #define sclPin 5
 #define sdaPin 4
 
+#define rotaryBtnPin 13
+#define rotaryClkPin 14
+#define rotaryDtPin 12
+
 //* SSD1306 - I2C
 SSD1306_Driver display(4);
 
@@ -109,7 +113,10 @@ void init()
 	display.setTextSize(1);
 	display.setTextColor(WHITE);
 
-	infos = new InfoScreens(&display, BTN_PIN);
+//	infos = new InfoScreens(&display, BTN_PIN);
+	infos = new InfoScreens(&display);
+//	infos->initMFButton(BTN_PIN);
+	infos->initRotary(rotaryBtnPin, rotaryClkPin, rotaryDtPin );
 	initInfoScreens();
 	infos->show();
 
