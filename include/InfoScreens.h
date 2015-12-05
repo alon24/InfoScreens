@@ -282,7 +282,7 @@ private:
 	bool updateDisplay = false;
 	bool internalCanUpdateDisplay = true;
 	Timer screenUpdateTimer;
-	int btnPin=0;
+//	int btnPin=0;
 	long lastClickTime = 0;
 	int waitTimeForClick = 200;
 	MultiFunctionButton btn;
