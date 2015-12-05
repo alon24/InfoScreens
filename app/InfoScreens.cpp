@@ -294,6 +294,26 @@ InfoScreens::InfoScreens(SSD1306_Driver *dis, int btnPin) : BaseInfoElement::Bas
 	Serial.print(display->getCursorY());
 }
 
+<<<<<<< HEAD
+=======
+InfoScreens::InfoScreens(SSD1306_Driver *dis) : BaseInfoElement::BaseInfoElement()
+{
+	this->display = dis;
+	setCurrent(0);
+}
+
+void InfoScreens::setMFButton(int btnPin) {
+	this->btnPin = btnPin;
+	btn.initBtn(btnPin);
+	btn.enableClickAndHold(false);
+	btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+}
+
+void InfoScreens::setRotaryBtn(Rotary* rotary) {
+
+}
+
+>>>>>>> parent of 56c318b... test rot
 InfoPage* InfoScreens::createPage(String header){
 	InfoPage* el = new InfoPage(header);
 	el->setParent(this);
