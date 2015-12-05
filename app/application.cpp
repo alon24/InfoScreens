@@ -7,7 +7,7 @@
 
 #define LED_PIN 2 // GPIO2
 #define BTN_PIN 0
-#define ialn 222
+
 #define sclPin 5
 #define sdaPin 4
 

@@ -11,6 +11,7 @@
 #include <SmingCore/SmingCore.h>
 #include <drivers/SSD1306_Driver.h>
 #include "utils/MultiFunctionButton.h"
+#include "utils/Rotary.h"
 
 struct paramDataValues {
 	//TODO:ilan maybe have Vector<String*>
@@ -285,6 +286,7 @@ private:
 	long lastClickTime = 0;
 	int waitTimeForClick = 200;
 	MultiFunctionButton btn;
+	Rotary rotary;
 	ViewMode viewMode = ViewMode::INFO;
 
 	MenuEventDelegate delegatedMenuEvent;
@@ -292,6 +294,10 @@ private:
 public:
 
 	InfoScreens(SSD1306_Driver *dis, int btnPin);
+	InfoScreens(SSD1306_Driver *dis);
+	void initMFButton(int btnPin);
+	void initRotary(int btnPin, int encoderCLK, int encoderDT);
+
 	InfoPage* createPage(String header);
 	void addPage(InfoPage* page);
 	void show();

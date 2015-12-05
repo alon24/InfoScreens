@@ -294,6 +294,18 @@ InfoScreens::InfoScreens(SSD1306_Driver *dis, int btnPin) : BaseInfoElement::Bas
 	Serial.print(display->getCursorY());
 }
 
+InfoScreens::InfoScreens(SSD1306_Driver *dis) : BaseInfoElement::BaseInfoElement() {
+
+}
+
+void InfoScreens::initMFButton(int btnPin) {
+
+}
+
+void InfoScreens::initRotary(int btnPin, int encoderCLK, int encoderDT) {
+
+}
+
 InfoPage* InfoScreens::createPage(String header){
 	InfoPage* el = new InfoPage(header);
 	el->setParent(this);
