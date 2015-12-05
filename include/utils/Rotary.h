@@ -15,31 +15,37 @@
 typedef Delegate<void()> RotaryButtonActionDelegate;
 
 class Rotary {
+public:
+	MultiFunctionButton btn;
+
 private:
 	int encoderCLK =12;
 	int encoderDT =13;
 	volatile int lastEncoded = 0;
 	volatile long encoderValue = 0;
-	MultiFunctionButton btn;
+	ButtonActionDelegate delegatedActionEvent;
 
 public:
 	Rotary(){};
 	~Rotary(){};
 
 	Rotary(int btnPin, int encoderCLK, int encoderDT) {
-		this->init(btnPin, encoderCLK, encoderDT);
+		this->init(encoderCLK, encoderDT);
+		this->initBtn(btnPin);
 	};
 
-	void init(int btnPin, int encoderCLK, int encoderDT) {
+	void init(int encoderCLK, int encoderDT) {
 		this->encoderCLK = encoderCLK;
 		this->encoderDT = encoderDT;
 
-		pinMode(btnPin, INPUT);
-		digitalWrite(btnPin, HIGH); //turn pullup resistor on
-		btn.initBtn(btnPin, ButtonActionDelegate(&Rotary::btnClicked, this));
-
 		attachInterrupt(encoderCLK, RotaryButtonActionDelegate(&Rotary::updateEncoder, this), CHANGE);
 		attachInterrupt(encoderDT, RotaryButtonActionDelegate(&Rotary::updateEncoder, this), CHANGE);
+	};
+
+	void initBtn(int buttonPin, ButtonActionDelegate handler = null, bool pressAndHold = true) {
+		pinMode(buttonPin, INPUT);
+		digitalWrite(buttonPin, HIGH); //turn pullup resistor on
+		btn.initBtn(buttonPin, handler, pressAndHold);
 	};
 
 	void updateEncoder() {

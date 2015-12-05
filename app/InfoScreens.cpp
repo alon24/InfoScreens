@@ -310,8 +310,8 @@ void InfoScreens::initMFButton(int btnPin) {
 }
 
 void InfoScreens::initRotary(int btnPin, int encoderCLK, int encoderDT) {
-	rotary.init(btnPin, encoderCLK, encoderDT);
-
+	rotary.init(encoderCLK, encoderDT);
+	rotary.initBtn(btnPin, ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this), false);
 //	btn.initBtn(btnPin);
 //	btn.enableClickAndHold(false);
 //	btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
