@@ -1,36 +1,32 @@
 /*
- * SSD1306_Driver.cpp
+ * ILI9341_Driver.cpp
  *
  *  Created on: Aug 17, 2015
  *      Author: ilan
  */
-#include <drivers/SSD1306_Driver.h>
+#include <drivers/ILI9341_Driver.h>
+#include <SmingCore/SmingCore.h>
 
-// initializer for I2C - we only indicate the reset pin!
-SSD1306_Driver::SSD1306_Driver(int8_t reset) :
-Adafruit_SSD1306(reset) {
-}
-
-int16_t SSD1306_Driver::getCursorX() {
+int16_t ILI9341_Driver::getCursorX() {
 	return cursor_x;
 }
 
-int16_t SSD1306_Driver::getCursorY() {
+int16_t ILI9341_Driver::getCursorY() {
 	return cursor_y;
 }
 
-textRect* SSD1306_Driver::print(const String &s){
+textRect* ILI9341_Driver::print(const String &s){
 	textRect *t = new textRect();
 	t->x = cursor_x;
 	t->y = cursor_y;
 	t->h = 8;
-	Adafruit_SSD1306::print(s);
+	Adafruit_ILI9341::print(s);
 	t->w = cursor_x - t->x;
-//	Serial.printf("SSD1306_Driver::print %s %s,%s\n", s.c_str(), String(t->x).c_str(), String(t->y).c_str()  );
+//	Serial.printf("ILI9341_Driver::print %s %s,%s\n", s.c_str(), String(t->x).c_str(), String(t->y).c_str()  );
 	return t;
 }
 
-void SSD1306_Driver::printToLoc(const String &s, textRect &t, int color){
+void ILI9341_Driver::printToLoc(const String &s, textRect &t, int color){
 	setCursor(t.x, t.y);
 //	uint32_t free = system_get_free_heap_size();
 //	int ff = (int)free;
@@ -53,24 +49,25 @@ void SSD1306_Driver::printToLoc(const String &s, textRect &t, int color){
 //	Serial.printf(", 2= %i\n", ff );
 }
 
-void SSD1306_Driver::writeover(textRect &orig, const String &s, bool inverse) {
-	int textColor = WHITE;
-	int bkColor = BLACK;
+void ILI9341_Driver::writeover(textRect &orig, const String &s, bool inverse) {
+	int textColor = ILI9341_WHITE;
+	int bkColor = ILI9341_BLACK;
 	if (inverse) {
-		textColor = BLACK;
-		bkColor = WHITE;
+		textColor = ILI9341_BLACK;
+		bkColor = ILI9341_WHITE;
 	}
 
 	this->fillRect( orig.x, orig.y, orig.w, orig.h, bkColor);
 	this->printToLoc(s, orig, textColor);
 }
 
-textRect* SSD1306_Driver::getCurrentRect() {
+textRect* ILI9341_Driver::getCurrentRect() {
 	textRect *t = new textRect();
 	t->x = cursor_x;
 	t->y = cursor_y;
 }
 
-int SSD1306_Driver::getMaxLines() {
+int ILI9341_Driver::getMaxLines() {
 	return 6;
 }
+
