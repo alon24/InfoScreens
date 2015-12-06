@@ -325,6 +325,7 @@ void InfoScreens::initRotary(int btnPin, int encoderCLK, int encoderDT) {
 		delete(btn);
 	}
 	btn = rotary->initBtn(btnPin, ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this), false);
+	rotary->setOnWheelEvent(RotaryWheelActionDelegate(&InfoScreens::rotaryWheelMoved, this));
 }
 
 InfoPage* InfoScreens::createPage(String header){
@@ -737,6 +738,15 @@ void InfoScreens::editFieldModeBtnClicked(MultiFunctionButtonAction event)
 
 void InfoScreens::setOnMenuEventDelegate(MenuEventDelegate handler) {
 	delegatedMenuEvent  = handler;
+}
+
+void InfoScreens::rotaryWheelMoved(RotaryAction event) {
+	debugf("rotary change %i", event);
+	if (event == RotaryAction::NEXT) {
+		moveRight();
+	} else {
+		moveLeft();
+	}
 }
 
 void InfoScreens::setCurrent(int index) {

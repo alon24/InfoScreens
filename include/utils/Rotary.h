@@ -12,8 +12,13 @@
 #include <SmingCore/SmingCore.h>
 #include "utils/MultiFunctionButton.h"
 
+enum class RotaryAction {
+	PREV = 0,
+	NEXT = 1
+};
+
 typedef Delegate<void()> RotaryButtonActionDelegate;
-typedef Delegate<void()> RotaryWheelActionDelegate;
+typedef Delegate<void(RotaryAction)> RotaryWheelActionDelegate;
 
 class Rotary {
 
@@ -23,7 +28,10 @@ private:
 	int encoderDT =13;
 	volatile int lastEncoded = 0;
 	volatile long encoderValue = 0;
-	ButtonActionDelegate delegatedActionEvent;
+	long lastencoderValue = 0;
+	int lastValue =-1000;
+	ButtonActionDelegate delegatedActionEvent = NULL;
+	RotaryWheelActionDelegate delegatedWheelEvent = NULL;
 
 public:
 	Rotary(){};
@@ -55,6 +63,12 @@ public:
 		return btn;
 	};
 
+	//Delegated call when event is triggered
+	void setOnWheelEvent(RotaryWheelActionDelegate handler) {
+		debugf("set setOnWheelEvent");
+		delegatedWheelEvent  = handler;
+	}
+
 	MultiFunctionButton* getButton() {
 		return btn;
 	}
@@ -70,9 +84,31 @@ public:
 		if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValue --;
 
 		lastEncoded = encoded; //store this value for next time
-		debugf("encoderValue=%i", encoderValue);
-		//	  handleEncoderInterrupt();
+//		debugf("encoderValue=%i", encoderValue);
+
+		handleEncoderInterrupt();
 	};
+
+
+	void handleEncoderInterrupt() {
+//		debugf("lv=%i, ev=%i", lastValue, encoderValue);
+		int count=4;
+		if(lastValue != encoderValue/count && (encoderValue %count == 0)) {
+			if (!delegatedWheelEvent) {
+				debugf("no delegatedWheelEvent");
+				return;
+			}
+
+			if (lastValue > encoderValue/count) {
+				delegatedWheelEvent(RotaryAction::NEXT);
+			}
+			else {
+				delegatedWheelEvent(RotaryAction::PREV);
+			}
+			lastValue = encoderValue/4;
+		}
+	}
+
 
 	void btnClicked(MultiFunctionButtonAction event) {
 		switch (event) {

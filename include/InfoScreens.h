@@ -324,6 +324,8 @@ public:
 	void editFieldModeBtnClicked(MultiFunctionButtonAction event);
 	void setOnMenuEventDelegate(MenuEventDelegate handler);
 
+	void rotaryWheelMoved(RotaryAction event);
+
 private:
 	void handleScreenUpdateTimer();
 	void print(int pIndex);
