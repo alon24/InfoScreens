@@ -13,12 +13,12 @@
 #include "utils/MultiFunctionButton.h"
 
 typedef Delegate<void()> RotaryButtonActionDelegate;
+typedef Delegate<void()> RotaryWheelActionDelegate;
 
 class Rotary {
-public:
-	MultiFunctionButton* btn = NULL;
 
 private:
+	MultiFunctionButton* btn = NULL;
 	int encoderCLK =12;
 	int encoderDT =13;
 	volatile int lastEncoded = 0;
@@ -54,6 +54,10 @@ public:
 		btn->initBtn(buttonPin, handler, pressAndHold);
 		return btn;
 	};
+
+	MultiFunctionButton* getButton() {
+		return btn;
+	}
 
 	void updateEncoder() {
 		int MSB = digitalRead(encoderCLK); //MSB = most significant bit
