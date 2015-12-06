@@ -16,7 +16,7 @@
 #define rotaryDtPin 12
 
 //* SSD1306 - I2C
-SSD1306_Driver display(4);
+SSD1306_Driver displayA(4);
 
 Timer procTimer;
 bool state = true;
@@ -107,14 +107,14 @@ void init()
 	Serial.systemDebugOutput(true); // Debug output to serial
 	Wire.pins(sclPin, sdaPin);
 
-	display.begin(SSD1306_SWITCHCAPVCC);
-	display.clearDisplay();
+	displayA.begin(SSD1306_SWITCHCAPVCC);
+	displayA.cleardisplay();
 
-	display.setTextSize(1);
-	display.setTextColor(WHITE);
+	displayA.setTextSize(1);
+	displayA.setTextColor(WHITE);
 
-//	infos = new InfoScreens(&display, BTN_PIN);
-	infos = new InfoScreens(&display);
+//	infos = new InfoScreens(&displayA, BTN_PIN);
+	infos = new InfoScreens(&displayA);
 //	infos->initMFButton(BTN_PIN);
 	infos->initRotary(rotaryBtnPin, rotaryClkPin, rotaryDtPin );
 	initInfoScreens();

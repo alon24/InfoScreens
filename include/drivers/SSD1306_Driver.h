@@ -24,7 +24,8 @@ public:
 	void writeover(textRect &orig, const String &s, bool inverse = false);
 
 	textRect* getCurrentRect();
-
 	int getMaxLines();
+
+
 };
 #endif /* INCLUDE_SSD1306_DRIVER_H_ */

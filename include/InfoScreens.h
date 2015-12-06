@@ -135,7 +135,8 @@ class BaseInfoElement
 protected:
 	String id;
 	BaseInfoElement* parent;
-	SSD1306_Driver* display;
+//	SSD1306_Driver* display;
+	Base_Screen_Drive* display;
 
 public:
 	//Simplified constructor because not all elements need id
@@ -145,7 +146,7 @@ public:
 		this->id = id;
 	};
 
-	void setDisplay(SSD1306_Driver* disp) {
+	void setDisplay(Base_Screen_Drive* disp) {
 		this->display = disp;
 	}
 
