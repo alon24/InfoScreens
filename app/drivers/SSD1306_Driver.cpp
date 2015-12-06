@@ -30,7 +30,7 @@ textRect* SSD1306_Driver::print(const String &s){
 	return t;
 }
 
-void SSD1306_Driver::printToLoc(const String &s, textRect &t, int color){
+void SSD1306_Driver::printToLoc(const String &s, textRect &t, int color = WHITE){
 	setCursor(t.x, t.y);
 //	uint32_t free = system_get_free_heap_size();
 //	int ff = (int)free;

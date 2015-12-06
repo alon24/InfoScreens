@@ -20,7 +20,7 @@ public:
 	int16_t getCursorY();
 
 	textRect* print(const String &s);
-	void printToLoc(const String &s, textRect &t, int textColor = WHITE);
+	void printToLoc(const String &s, textRect &t, int textColor);
 	void writeover(textRect &orig, const String &s, bool inverse = false);
 
 	textRect* getCurrentRect();
