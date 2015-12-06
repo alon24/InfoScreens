@@ -281,9 +281,7 @@ InfoScreens::InfoScreens(SSD1306_Driver *dis, int btnPin) : BaseInfoElement::Bas
 	this->display = dis;
 	setCurrent(0);
 
-	btn.initBtn(btnPin);
-	btn.enableClickAndHold(false);
-	btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+	initMFButton(btnPin);
 
 	screenUpdateTimer.setCallback(showScreenUpdateDelegate(&InfoScreens::handleScreenUpdateTimer, this));
 	screenUpdateTimer.setIntervalMs(80);
@@ -303,19 +301,30 @@ InfoScreens::InfoScreens(SSD1306_Driver *dis) : BaseInfoElement::BaseInfoElement
 	display->print("InfoScreens");
 }
 
+InfoScreens::~InfoScreens() {
+	delete(rotary);
+	delete(btn);
+}
+
 void InfoScreens::initMFButton(int btnPin) {
-	btn.initBtn(btnPin);
-	btn.enableClickAndHold(false);
-	btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+	if (btn) {
+		delete(btn);
+	}
+
+	btn = new MultiFunctionButton();
+	btn->initBtn(btnPin);
+	btn->enableClickAndHold(false);
+	btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 }
 
 void InfoScreens::initRotary(int btnPin, int encoderCLK, int encoderDT) {
-	rotary.init(encoderCLK, encoderDT);
-	rotary.initBtn(btnPin, ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this), false);
-//	btn.initBtn(btnPin);
-//	btn.enableClickAndHold(false);
-//	btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+	rotary = new Rotary();
+	rotary->init(encoderCLK, encoderDT);
 
+	if (btn != NULL) {
+		delete(btn);
+	}
+	btn = rotary->initBtn(btnPin, ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this), false);
 }
 
 InfoPage* InfoScreens::createPage(String header){
@@ -385,18 +394,18 @@ void InfoScreens::setViewMode(ViewMode mode) {
 
 	this->viewMode = mode;
 	if(mode == ViewMode::INFO) {
-		btn.enableClickAndHold(false);
-		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+		btn->enableClickAndHold(false);
+		btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 
 	} else if(mode == ViewMode::EDIT){
-		btn.enableClickAndHold(false);
-		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
+		btn->enableClickAndHold(false);
+		btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
 		showEditParam();
 //		moveToNextEditParam();
 	}
 	else if(mode == ViewMode::EDIT_FIELD) {
-		btn.enableClickAndHold(true);
-		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editFieldModeBtnClicked, this));
+		btn->enableClickAndHold(true);
+		btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editFieldModeBtnClicked, this));
 //		moveToNextEditParam();
 	}
 

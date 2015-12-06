@@ -16,7 +16,7 @@ typedef Delegate<void()> RotaryButtonActionDelegate;
 
 class Rotary {
 public:
-	MultiFunctionButton btn;
+	MultiFunctionButton* btn = NULL;
 
 private:
 	int encoderCLK =12;
@@ -27,7 +27,9 @@ private:
 
 public:
 	Rotary(){};
-	~Rotary(){};
+	~Rotary(){
+		delete (btn);
+	};
 
 	Rotary(int btnPin, int encoderCLK, int encoderDT) {
 		this->init(encoderCLK, encoderDT);
@@ -42,10 +44,15 @@ public:
 		attachInterrupt(encoderDT, RotaryButtonActionDelegate(&Rotary::updateEncoder, this), CHANGE);
 	};
 
-	void initBtn(int buttonPin, ButtonActionDelegate handler = null, bool pressAndHold = true) {
+	MultiFunctionButton* initBtn(int buttonPin, ButtonActionDelegate handler = null, bool pressAndHold = true) {
+		if (!btn) {
+			btn = new MultiFunctionButton();
+		}
+
 		pinMode(buttonPin, INPUT);
 		digitalWrite(buttonPin, HIGH); //turn pullup resistor on
-		btn.initBtn(buttonPin, handler, pressAndHold);
+		btn->initBtn(buttonPin, handler, pressAndHold);
+		return btn;
 	};
 
 	void updateEncoder() {

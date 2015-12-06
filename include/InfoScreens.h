@@ -284,8 +284,8 @@ private:
 	Timer screenUpdateTimer;
 	long lastClickTime = 0;
 	int waitTimeForClick = 200;
-	MultiFunctionButton btn;
-	Rotary rotary;
+	MultiFunctionButton* btn = NULL;
+	Rotary* rotary = NULL;
 	ViewMode viewMode = ViewMode::INFO;
 
 	MenuEventDelegate delegatedMenuEvent;
@@ -294,6 +294,8 @@ public:
 
 	InfoScreens(SSD1306_Driver *dis, int btnPin);
 	InfoScreens(SSD1306_Driver *dis);
+
+	~InfoScreens();
 	void initMFButton(int btnPin);
 	void initRotary(int btnPin, int encoderCLK, int encoderDT);
 
