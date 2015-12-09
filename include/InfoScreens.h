@@ -9,7 +9,8 @@
 #define INCLUDE_INFOSCREENS_H_
 
 #include <SmingCore/SmingCore.h>
-#include <drivers/SSD1306_Driver.h>
+
+#include "drivers/Base_Display_Driver.h"
 #include "utils/MultiFunctionButton.h"
 #include "utils/Rotary.h"
 
@@ -136,7 +137,7 @@ protected:
 	String id;
 	BaseInfoElement* parent;
 //	SSD1306_Driver* display;
-	Base_Screen_Drive* display;
+	Base_Display_Driver* display;
 
 public:
 	//Simplified constructor because not all elements need id
@@ -146,7 +147,8 @@ public:
 		this->id = id;
 	};
 
-	void setDisplay(Base_Screen_Drive* disp) {
+	void setDisplay(Base_Display_Driver* disp) {
+		debugf("111");
 		this->display = disp;
 	}
 
@@ -293,8 +295,8 @@ private:
 	EditModeBlinkingInfo editModeBlinkInfo;
 public:
 
-	InfoScreens(SSD1306_Driver *dis, int btnPin);
-	InfoScreens(SSD1306_Driver *dis);
+	InfoScreens(Base_Display_Driver *dis, int btnPin);
+	InfoScreens(Base_Display_Driver *dis);
 
 	~InfoScreens();
 	void initMFButton(int btnPin);

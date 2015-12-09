@@ -9,10 +9,10 @@
 #define INCLUDE_DRIVERS_ILI9341_DRIVER_H_
 
 #include <Libraries/Adafruit_ILI9341/Adafruit_ILI9341.h>
-#include "Base_Screen_Driver.h"
 #include <SmingCore/SmingCore.h>
+#include "include/drivers/Base_Display_Driver.h"
 
-class ILI9341_Driver : public Base_Screen_Drive, public Adafruit_ILI9341 {
+class ILI9341_Driver : public Base_Display_Driver, public Adafruit_ILI9341 {
 	int16_t getCursorX();
 	int16_t getCursorY();
 
@@ -22,6 +22,8 @@ class ILI9341_Driver : public Base_Screen_Drive, public Adafruit_ILI9341 {
 
 	textRect* getCurrentRect();
 	int getMaxLines();
+	void setCursor(int16_t x, int16_t y){};
+	void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color){};
 };
 
 

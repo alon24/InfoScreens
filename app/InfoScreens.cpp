@@ -276,7 +276,7 @@ paramData InfoPage::getParamText(String id){
 	return parent->getParamText(id);
 }
 
-InfoScreens::InfoScreens(SSD1306_Driver *dis, int btnPin) : BaseInfoElement::BaseInfoElement()
+InfoScreens::InfoScreens(Base_Display_Driver *dis, int btnPin) : BaseInfoElement::BaseInfoElement()
 {
 	this->display = dis;
 	setCurrent(0);
@@ -287,10 +287,11 @@ InfoScreens::InfoScreens(SSD1306_Driver *dis, int btnPin) : BaseInfoElement::Bas
 	screenUpdateTimer.setIntervalMs(80);
 	screenUpdateTimer.start(true);
 
-	display->print("InfoScreens");
+	display->print("InfoScreens0");
+	display->display();
 }
 
-InfoScreens::InfoScreens(SSD1306_Driver *dis) : BaseInfoElement::BaseInfoElement() {
+InfoScreens::InfoScreens(Base_Display_Driver *dis) : BaseInfoElement::BaseInfoElement() {
 	this->display = dis;
 	setCurrent(0);
 
@@ -298,7 +299,9 @@ InfoScreens::InfoScreens(SSD1306_Driver *dis) : BaseInfoElement::BaseInfoElement
 	screenUpdateTimer.setIntervalMs(80);
 	screenUpdateTimer.start(true);
 
-	display->print("InfoScreens");
+	display->clearDisplay();
+	display->print("InfoScreens1");
+	display->display();
 }
 
 InfoScreens::~InfoScreens() {
@@ -349,7 +352,7 @@ void InfoScreens::show() {
 //		lastUpdateTime = millis();
 	setCanUpdateDisplay(false);
 	display->clearDisplay();
-	display->display();
+//	display->display();
 	paramValueMap["currentPage"].dirty = true;
 	setCanUpdateDisplay(true);
 }
@@ -537,19 +540,21 @@ String InfoScreens::moveToNextValue() {
 //InfoScreeens private
 
 void InfoScreens::handleScreenUpdateTimer() {
+//	debugf("canUpdateDisplay=%i, internalCanUpdateDisplay=%i",canUpdateDisplay() ,internalCanUpdateDisplay );
 	if(canUpdateDisplay() && internalCanUpdateDisplay) {
 		if (mChildern.size() == 0) {
 			debugf("I cannot print anything, no Pages declared, setting to NOT update display");
 			setCanUpdateDisplay(false);
 			return;
 		}
-
+		debugf("1");
 		if (paramValueMap["currentPage"].dirty) {
 //				debugf("currentPage = %i, paramValueMap['currentPage'].dirty= %d",paramValueMap["currentPage"].val.toInt(), (int)paramValueMap["currentPage"].dirty);
 			display->clearDisplay();
 			display->setCursor(0,0);
 			print(paramValueMap["currentPage"].val->toInt());
 			paramValueMap["currentPage"].clearDirty();
+			debugf("2");
 		}
 		else {
 			internalCanUpdateDisplay = false;
@@ -623,7 +628,6 @@ void InfoScreens::handleScreenUpdateTimer() {
 					drawBlinkParamLine(p, linecolor);
 				}
 
-//				if
 			}
 		}
 	}
@@ -659,7 +663,7 @@ void InfoScreens::print(int pIndex) {
 	InfoPage* p = get(pIndex);
 //		debugf("print,3 %s", p->getId().c_str() );
 	p->print();
-//		debugf("print, 4");
+		debugf("print, 4");
 	internalCanUpdateDisplay = true;
 }
 
