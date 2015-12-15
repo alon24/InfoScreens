@@ -20,10 +20,6 @@ void SSD1306_Driver::init() {
 	display();
 }
 
-//SSD1306_Driver::~SSD1306_Driver() {
-//
-//}
-
 int16_t SSD1306_Driver::getCursorX() {
 	return cursor_x;
 }

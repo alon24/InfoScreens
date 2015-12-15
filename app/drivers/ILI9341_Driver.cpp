@@ -5,7 +5,10 @@
  *      Author: ilan
  */
 #include <drivers/ILI9341_Driver.h>
-#include <SmingCore/SmingCore.h>
+
+ILI9341_Driver::ILI9341_Driver() : Base_Display_Driver(), Adafruit_ILI9341()
+{
+}
 
 int16_t ILI9341_Driver::getCursorX() {
 	return cursor_x;
@@ -69,5 +72,45 @@ textRect* ILI9341_Driver::getCurrentRect() {
 
 int ILI9341_Driver::getMaxLines() {
 	return 6;
+}
+
+void ILI9341_Driver::clearDisplay(void){
+	Adafruit_ILI9341::fillScreen(WHITE);
+}
+
+void ILI9341_Driver::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color){
+	Adafruit_ILI9341::fillRect(x, y, w, h, color);
+}
+
+void ILI9341_Driver::display(){
+//	Adafruit_ILI9341::display();
+}
+
+void ILI9341_Driver::setCursor(int16_t x, int16_t y){
+	Adafruit_ILI9341::setCursor(x, y);
+}
+
+void ILI9341_Driver::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color){
+	Adafruit_ILI9341::drawFastVLine(x, y, h, color);
+}
+
+void ILI9341_Driver::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color){
+	Adafruit_ILI9341::drawFastHLine(x, y, w, color);
+}
+
+void ILI9341_Driver::drawPixel(int16_t x, int16_t y, uint16_t color){
+	Adafruit_ILI9341::drawPixel(x, y, color);
+}
+
+size_t ILI9341_Driver::println(void){
+	return Adafruit_ILI9341::println();
+}
+
+void ILI9341_Driver::setTextSize(uint8_t s){
+	Adafruit_ILI9341::setTextSize(s);
+}
+
+void ILI9341_Driver::setTextColor(uint16_t c){
+	Adafruit_ILI9341::setTextColor(c);
 }
 

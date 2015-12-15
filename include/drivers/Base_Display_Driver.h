@@ -17,7 +17,7 @@ struct textRect {
 	int h = -1;
 	int w=-1;
 };
-
+//
 #define BLACK 0
 #define WHITE 1
 
