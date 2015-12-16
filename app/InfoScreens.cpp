@@ -547,14 +547,14 @@ void InfoScreens::handleScreenUpdateTimer() {
 			setCanUpdateDisplay(false);
 			return;
 		}
-		debugf("1");
+//		debugf("1");
 		if (paramValueMap["currentPage"].dirty) {
 //				debugf("currentPage = %i, paramValueMap['currentPage'].dirty= %d",paramValueMap["currentPage"].val.toInt(), (int)paramValueMap["currentPage"].dirty);
 			display->clearDisplay();
 			display->setCursor(0,0);
 			print(paramValueMap["currentPage"].val->toInt());
 			paramValueMap["currentPage"].clearDirty();
-			debugf("2");
+//			debugf("2");
 		}
 		else {
 			internalCanUpdateDisplay = false;
@@ -663,7 +663,7 @@ void InfoScreens::print(int pIndex) {
 	InfoPage* p = get(pIndex);
 //		debugf("print,3 %s", p->getId().c_str() );
 	p->print();
-		debugf("print, 4");
+//		debugf("print, 4");
 	internalCanUpdateDisplay = true;
 }
 
@@ -745,7 +745,7 @@ void InfoScreens::setOnMenuEventDelegate(MenuEventDelegate handler) {
 }
 
 void InfoScreens::rotaryWheelMoved(RotaryAction event) {
-	debugf("rotary change %i", event);
+//	debugf("rotary change %i", event);
 	if (event == RotaryAction::NEXT) {
 		moveRight();
 	} else {

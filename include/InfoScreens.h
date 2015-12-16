@@ -148,7 +148,7 @@ public:
 	};
 
 	void setDisplay(Base_Display_Driver* disp) {
-		debugf("111");
+//		debugf("111");
 		this->display = disp;
 	}
 

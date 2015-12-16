@@ -1,6 +1,7 @@
 #include <user_config.h>
 #include <SmingCore/SmingCore.h>
 #include <drivers/SSD1306_driver.h>
+#include <drivers/ILI9341_driver.h>
 
 #include <InfoScreens.h>
 #include <utils.h>
@@ -14,6 +15,9 @@
 #define rotaryBtnPin 13
 #define rotaryClkPin 14
 #define rotaryDtPin 12
+
+//pins for spi
+//#define clk 15
 
 //* SSD1306 - I2C
 Base_Display_Driver* displayA;
