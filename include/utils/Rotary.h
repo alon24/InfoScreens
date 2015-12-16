@@ -32,14 +32,21 @@ private:
 	int lastValue =-1000;
 	ButtonActionDelegate delegatedActionEvent = NULL;
 	RotaryWheelActionDelegate delegatedWheelEvent = NULL;
+	Timer rotaryTimer;
+	int rotaryChangeCountResolution=4;
 
 public:
-	Rotary(){};
+	Rotary(){
+		rotaryTimer.initializeMs(100, TimerDelegate(&Rotary::updateInternalRotaryState, this)).start();
+	};
+
 	~Rotary(){
 		delete (btn);
+		rotaryTimer.stop();
 	};
 
 	Rotary(int btnPin, int encoderCLK, int encoderDT) {
+		Rotary();
 		this->init(encoderCLK, encoderDT);
 		this->initBtn(btnPin);
 	};
@@ -73,7 +80,7 @@ public:
 		return btn;
 	}
 
-	void updateEncoder() {
+	void IRAM_ATTR updateEncoder() {
 		int MSB = digitalRead(encoderCLK); //MSB = most significant bit
 		int LSB = digitalRead(encoderDT); //LSB = least significant bit
 
@@ -86,29 +93,33 @@ public:
 		lastEncoded = encoded; //store this value for next time
 //		debugf("encoderValue=%i", encoderValue);
 
-		handleEncoderInterrupt();
+//		handleEncoderInterrupt();
 	};
 
+	void updateInternalRotaryState() {
+		if (encoderValue == lastencoderValue) {
+			return;
+		}
 
-	void handleEncoderInterrupt() {
-//		debugf("lv=%i, ev=%i", lastValue, encoderValue);
-		int count=4;
-		if(lastValue != encoderValue/count && (encoderValue %count == 0)) {
-			if (!delegatedWheelEvent) {
-				debugf("no delegatedWheelEvent");
-				return;
-			}
+		if (!delegatedWheelEvent) {
+			debugf("no delegatedWheelEvent");
+			return;
+		}
 
-			if (lastValue > encoderValue/count) {
+		//check
+		if (abs(encoderValue - lastencoderValue ) >= rotaryChangeCountResolution) {
+//			debugf("encoderValue=%i, lastencoderValue=%i", encoderValue, lastencoderValue);
+			if(lastencoderValue > encoderValue) {
 				delegatedWheelEvent(RotaryAction::NEXT);
+//				debugf("bigger");
 			}
 			else {
 				delegatedWheelEvent(RotaryAction::PREV);
+//				debugf("smaller");
 			}
-			lastValue = encoderValue/4;
+			lastencoderValue = encoderValue;
 		}
 	}
-
 
 	void btnClicked(MultiFunctionButtonAction event) {
 		switch (event) {
