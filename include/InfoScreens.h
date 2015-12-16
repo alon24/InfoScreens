@@ -292,14 +292,6 @@ private:
 public:
 
 	InfoScreens(SSD1306_Driver *dis, int btnPin);
-<<<<<<< HEAD
-=======
-	InfoScreens(SSD1306_Driver *dis);
-
-	void setMFButton(int btnPin);
-	void setRotaryBtn(Rotary* rotary);
-
->>>>>>> parent of 56c318b... test rot
 	InfoPage* createPage(String header);
 	void addPage(InfoPage* page);
 	void show();
