@@ -14,7 +14,8 @@
 
 enum class RotaryAction {
 	PREV = 0,
-	NEXT = 1
+	NEXT = 1,
+	NONE = 2
 };
 
 typedef Delegate<void()> RotaryButtonActionDelegate;
@@ -35,6 +36,8 @@ private:
 	Timer rotaryTimer;
 	int rotaryChangeCountResolution=4;
 
+	RotaryAction act = RotaryAction::NONE;
+//	long lastReadTime =0;
 public:
 	Rotary(){
 		rotaryTimer.initializeMs(100, TimerDelegate(&Rotary::updateInternalRotaryState, this)).start();
@@ -81,6 +84,13 @@ public:
 	}
 
 	void IRAM_ATTR updateEncoder() {
+//		long current = millis();
+////		implement some debounce
+//		if (current - lastReadTime < 125) {
+//			return;
+//		}
+//		lastReadTime = current;
+
 		int MSB = digitalRead(encoderCLK); //MSB = most significant bit
 		int LSB = digitalRead(encoderDT); //LSB = least significant bit
 
@@ -91,14 +101,20 @@ public:
 		if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValue --;
 
 		lastEncoded = encoded; //store this value for next time
-//		debugf("encoderValue=%i", encoderValue);
-
-//		handleEncoderInterrupt();
 	};
 
-	void updateInternalRotaryState() {
-		if (encoderValue == lastencoderValue) {
-			return;
+	void IRAM_ATTR updateInternalRotaryState() {
+		int tmp = encoderValue;
+		if (tmp > lastencoderValue && (tmp - lastencoderValue >4)) {
+			act = RotaryAction::PREV;
+			debugf("Prev");
+			lastencoderValue = tmp;
+
+		}
+		else if (tmp < lastencoderValue && (lastencoderValue - tmp >4)){
+			act = RotaryAction::NEXT;
+			debugf("Next");
+			lastencoderValue = tmp;
 		}
 
 		if (!delegatedWheelEvent) {
@@ -106,19 +122,10 @@ public:
 			return;
 		}
 
-		//check
-		if (abs(encoderValue - lastencoderValue ) >= rotaryChangeCountResolution) {
-//			debugf("encoderValue=%i, lastencoderValue=%i", encoderValue, lastencoderValue);
-			if(lastencoderValue > encoderValue) {
-				delegatedWheelEvent(RotaryAction::NEXT);
-//				debugf("bigger");
-			}
-			else {
-				delegatedWheelEvent(RotaryAction::PREV);
-//				debugf("smaller");
-			}
-			lastencoderValue = encoderValue;
+		if (act != RotaryAction::NONE) {
+			delegatedWheelEvent(act);
 		}
+		act = RotaryAction::NONE;
 	}
 
 	void btnClicked(MultiFunctionButtonAction event) {
@@ -133,10 +140,6 @@ public:
 				break;
 			case BTN_LONG_CLICK:
 				debugf("BTN_LONG_CLICK");
-
-//				if(getCurrent()->getallEditableParams().size() != 0) {
-//					setViewMode(ViewMode::EDIT);
-//				}
 				break;
 			case BTN_HOLD_CLICK:
 				debugf("BTN_HOLD_CLICK");

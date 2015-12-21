@@ -15,7 +15,6 @@
 #include "utils/Rotary.h"
 
 struct paramDataValues {
-	//TODO:ilan maybe have Vector<String*>
 	Vector<String*> data;
 	int currentDataIndex = -1;
 
