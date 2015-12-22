@@ -36,7 +36,7 @@ private:
 	Timer rotaryTimer;
 	int rotaryChangeCountResolution=4;
 
-	RotaryAction act = RotaryAction::NONE;
+	volatile RotaryAction act = RotaryAction::NONE;
 
 	volatile unsigned long threshold = 1000;
 
@@ -59,7 +59,7 @@ private:
 
 public:
 	Rotary(){
-//		rotaryTimer.initializeMs(100, TimerDelegate(&Rotary::updateInternalRotaryState, this)).start();
+		rotaryTimer.initializeMs(100, TimerDelegate(&Rotary::updateInternalRotaryState, this)).start();
 	};
 
 	~Rotary(){
@@ -113,25 +113,26 @@ public:
 
 	void showResult() {
 		int tmp = rotaryHalfSteps;
-		if (tmp %2 != 0 || rotary) {
+//		if (tmp %2 != 0 ) {
+//			return;
+//		}
+
+		if (tmp == lastRotarySteps) {
 			return;
 		}
 
-		if (tmp/2 == lastRotarySteps) {
-			return;
+		if (lastRotarySteps > tmp) {
+			act = RotaryAction::PREV;
+//			debugf("setting prev, %i, %i", lastRotarySteps,tmp/2);
+		}
+		else {
+			act = RotaryAction::NEXT;
+//			debugf("setting next, %i, %i", lastRotarySteps,tmp/2);
 		}
 
-//		rotary = true;
-//		if (lastRotarySteps > tmp) {
-//			act = RotaryAction::PREV;
-//		}
-//		else {
-//			act == RotaryAction::NEXT;
-//		}
+//		lastRotarySteps = rotaryHalfSteps /2;
 
-		lastRotarySteps = rotaryHalfSteps /2;
-
-		debugf("%i",tmp/2);
+		debugf("%i",tmp );
 //		rotary = false;
 	}
 
@@ -156,29 +157,9 @@ public:
 		return btn;
 	}
 
-	void IRAM_ATTR updateEncoder() {
-//		long current = millis();
-////		implement some debounce
-//		if (current - lastReadTime < 125) {
-//			return;
-//		}
-//		lastReadTime = current;
-
-		int MSB = digitalRead(encoderCLK); //MSB = most significant bit
-		int LSB = digitalRead(encoderDT); //LSB = least significant bit
-
-		int encoded = (MSB << 1) |LSB; //converting the 2 pin value to single number
-		int sum  = (lastEncoded << 2) | encoded; //adding it to the previous encoded value
-
-		if(sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) encoderValue ++;
-		if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValue --;
-
-		lastEncoded = encoded; //store this value for next time
-	};
-
-	void IRAM_ATTR updateInternalRotaryState() {
-		int tmp = lastRotarySteps;
-		rotary = true;
+	void updateInternalRotaryState() {
+//		int tmp = lastRotarySteps;
+//		rotary = true;
 
 //		if (tmp > lastencoderValue && (tmp - lastencoderValue >4)) {
 //			act = RotaryAction::PREV;
@@ -197,13 +178,14 @@ public:
 			return;
 		}
 
-		rotary = false;
 		if (act != RotaryAction::NONE) {
+			debugf("state= %i,%i,%i", (act == RotaryAction::PREV), (act == RotaryAction::NEXT), (act == RotaryAction::NONE));
 			delegatedWheelEvent(act);
+			act = RotaryAction::NONE;
+//			debugf("rotary:none");
+			//only change after consume
+			lastRotarySteps = rotaryHalfSteps /2;
 		}
-		act = RotaryAction::NONE;
-		debugf("rotary:none");
-		rotary = true;
 	}
 
 	void btnClicked(MultiFunctionButtonAction event) {
