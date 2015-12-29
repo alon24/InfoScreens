@@ -20,7 +20,7 @@
 //#define clk 15
 
 //* SSD1306 - I2C
-Base_Display_Driver* displayA;
+Base_Display_Driver* display;
 
 Timer procTimer;
 bool state = true;
@@ -110,14 +110,14 @@ void init()
 	Serial.begin(SERIAL_BAUD_RATE); // 115200
 	Serial.systemDebugOutput(true); // Debug output to serial
 	Wire.pins(sclPin, sdaPin);
-	displayA = new SSD1306_Driver(4);
-	displayA->init();
+	display = new SSD1306_Driver(4);
+	display->init();
 
 //	infos = new InfoScreens(&displayA, BTN_PIN);
-	infos = new InfoScreens(displayA);
+	infos = new InfoScreens(display);
 	initInfoScreens();
-//	infos->initMFButton(BTN_PIN);
-	infos->initRotary(rotaryBtnPin, rotaryClkPin, rotaryDtPin );
+	infos->initMFButton(BTN_PIN);
+//	infos->initRotary(rotaryBtnPin, rotaryClkPin, rotaryDtPin );
 	infos->show();
 //
 	updater.initializeMs(300, handleUpdateTimer).start();
