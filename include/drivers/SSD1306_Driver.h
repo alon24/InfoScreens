@@ -23,6 +23,8 @@ public:
 	void writeover(textRect &orig, const String &s, bool inverse = false);
 	textRect* getCurrentRect();
 	int getMaxLines();
+	int getBlack();
+	int getWhite();
 
 	void clearDisplay(void);
 	void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);

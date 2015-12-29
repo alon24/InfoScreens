@@ -8,13 +8,20 @@
 #ifndef INCLUDE_DRIVERS_ILI9341_DRIVER_H_
 #define INCLUDE_DRIVERS_ILI9341_DRIVER_H_
 
-#include <Libraries/Adafruit_ILI9341/Adafruit_ILI9341.h>
+#include <Libraries/Adafruit_PCD8544/Adafruit_PCD8544.h>
 #include <SmingCore/SmingCore.h>
 #include "Base_Display_Driver.h"
 
-class ILI9341_Driver: public Base_Display_Driver, public Adafruit_ILI9341 {
+class PCD8544_Driver: public Base_Display_Driver, public Adafruit_PCD8544 {
 public:
-	ILI9341_Driver();
+	// Software SPI with explicit CS pin.
+	PCD8544_Driver(int8_t SCLK, int8_t DIN, int8_t DC, int8_t CS, int8_t RST);
+	// Software SPI with CS tied to ground.  Saves a pin but other pins can't be shared with other hardware.
+	PCD8544_Driver(int8_t SCLK, int8_t DIN, int8_t DC, int8_t RST);
+	// Hardware SPI based on hardware controlled SCK (SCLK) and MOSI (DIN) pins. CS is still controlled by any IO pin.
+	// NOTE: MISO and SS will be set as an input and output respectively, so be careful sharing those pins!
+	PCD8544_Driver(int8_t DC, int8_t CS, int8_t RST);
+
 	void init();
 	int16_t getCursorX();
 	int16_t getCursorY();

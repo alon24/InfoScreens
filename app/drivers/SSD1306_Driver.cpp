@@ -86,6 +86,14 @@ int SSD1306_Driver::getMaxLines() {
 	return 6;
 }
 
+int SSD1306_Driver::getBlack() {
+	return BLACK;
+}
+
+int SSD1306_Driver::getWhite() {
+	return WHITE;
+}
+
 void SSD1306_Driver::clearDisplay(void){
 	Adafruit_SSD1306::clearDisplay();
 }

@@ -74,8 +74,16 @@ int ILI9341_Driver::getMaxLines() {
 	return 6;
 }
 
+int ILI9341_Driver::getBlack() {
+	return ILI9341_BLACK;
+}
+
+int ILI9341_Driver::getWhite() {
+	return ILI9341_WHITE;
+}
+
 void ILI9341_Driver::clearDisplay(void){
-	Adafruit_ILI9341::fillScreen(WHITE);
+	Adafruit_ILI9341::fillScreen(ILI9341_WHITE);
 }
 
 void ILI9341_Driver::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color){

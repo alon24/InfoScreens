@@ -590,19 +590,19 @@ void InfoScreens::handleScreenUpdateTimer() {
 			}
 
 			if (editModeBlinkInfo.shouldEraseLast()) {
-				drawBlinkParamLine(editModeBlinkInfo.lastSelectedParam, BLACK);
+				drawBlinkParamLine(editModeBlinkInfo.lastSelectedParam, display->getBlack());
 				editModeBlinkInfo.lastSelectedParam = NULL;
 			}
 
 			long current = millis();
-			int linecolor = BLACK;
-			int symbleColor = BLACK;
+			int linecolor = display->getBlack();
+			int symbleColor = display->getBlack();
 			editModeBlinkInfo.handleTimeElapsed(current);
 
 			if (viewMode == ViewMode::EDIT || viewMode == ViewMode::EDIT_FIELD) {
 				if (editModeBlinkInfo.blinkDrawn) {
-					linecolor = WHITE;
-					symbleColor = WHITE;
+					linecolor = display->getWhite();
+					symbleColor = display->getWhite();
 					if (viewMode == ViewMode::EDIT_FIELD){
 //						linecolor = WHITE;
 					}
@@ -616,12 +616,12 @@ void InfoScreens::handleScreenUpdateTimer() {
 					if (viewMode == ViewMode::EDIT_FIELD) {
 						display->writeover(p->t, *paramValueMap[p->id].val, true);
 						if (extraW >0) {
-							display->fillRect(p->t.x + p->t.w, p->t.y, extraW, p->t.h, WHITE);
+							display->fillRect(p->t.x + p->t.w, p->t.y, extraW, p->t.h, display->getWhite());
 						}
 					} else {
 						display->writeover(p->t, *paramValueMap[p->id].val);
 						if (extraW >0) {
-							display->fillRect(p->t.x + p->t.w, p->t.y, extraW, p->t.h, BLACK);
+							display->fillRect(p->t.x + p->t.w, p->t.y, extraW, p->t.h, display->getBlack());
 						}
 					}
 //					debugf("linecolor = %i, currnet param %s", linecolor, getCurrent()->getCurrentEditParam()->toString().c_str() );
@@ -652,7 +652,7 @@ void InfoScreens::drawEditModeSign(int x, int y, int color) {
 	}
 
 	//even if F mode clear the line
-	if (color== BLACK){
+	if (color== display->getBlack()){
 		display->drawFastHLine(x, y+4, 3, color);
 	}
 }
