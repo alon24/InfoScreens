@@ -7,24 +7,22 @@
 #include <drivers/PCD8544_Driver.h>
 
 // Software SPI with explicit CS pin.
-PCD8544_Driver::PCD8544_Driver(int8_t SCLK, int8_t DIN, int8_t DC, int8_t CS, int8_t RST) : Adafruit_PCD8544(SCLK, DIN, DC, CS, RST) {
+PCD8544_Driver::PCD8544_Driver(int8_t SCLK, int8_t DIN, int8_t DC, int8_t CS, int8_t RST) : Base_Display_Driver(), Adafruit_PCD8544(SCLK, DIN, DC, CS, RST){
 
 }
 
 // Software SPI with CS tied to ground.  Saves a pin but other pins can't be shared with other hardware.
-PCD8544_Driver::PCD8544_Driver(int8_t SCLK, int8_t DIN, int8_t DC, int8_t RST) : Adafruit_PCD8544(SCLK, DIN, DC, RST){
+PCD8544_Driver::PCD8544_Driver(int8_t SCLK, int8_t DIN, int8_t DC, int8_t RST) : Base_Display_Driver(), Adafruit_PCD8544(SCLK, DIN, DC, RST){
 
 }
 // Hardware SPI based on hardware controlled SCK (SCLK) and MOSI (DIN) pins. CS is still controlled by any IO pin.
 // NOTE: MISO and SS will be set as an input and output respectively, so be careful sharing those pins!
-PCD8544_Driver::PCD8544_Driver(int8_t DC, int8_t CS, int8_t RST) : Adafruit_PCD8544(DC, CS, RST){
+PCD8544_Driver::PCD8544_Driver(int8_t DC, int8_t CS, int8_t RST) : Adafruit_PCD8544(DC, CS, RST), Base_Display_Driver(){
 
 }
 
-
-//PCD8544_Driver::PCD8544_Driver() : Base_Display_Driver()
-//{
-//}
+void PCD8544_Driver::init() {
+}
 
 int16_t PCD8544_Driver::getCursorX() {
 	return cursor_x;

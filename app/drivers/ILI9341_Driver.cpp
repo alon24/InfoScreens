@@ -10,6 +10,9 @@ ILI9341_Driver::ILI9341_Driver() : Base_Display_Driver(), Adafruit_ILI9341()
 {
 }
 
+void ILI9341_Driver::init() {
+}
+
 int16_t ILI9341_Driver::getCursorX() {
 	return cursor_x;
 }

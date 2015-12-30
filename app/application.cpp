@@ -1,7 +1,8 @@
 #include <user_config.h>
 #include <SmingCore/SmingCore.h>
 #include <drivers/SSD1306_driver.h>
-#include <drivers/ILI9341_driver.h>
+//#include <drivers/ILI9341_driver.h>
+//#include <drivers/PCD8544_driver.h>
 
 #include <InfoScreens.h>
 #include <utils.h>
@@ -111,6 +112,9 @@ void init()
 	Serial.systemDebugOutput(true); // Debug output to serial
 	Wire.pins(sclPin, sdaPin);
 	display = new SSD1306_Driver(4);
+//	display = new ILI9341_Driver();
+//	display = new PCD8544_Driver(13,14,15,4,5);
+
 	display->init();
 
 //	infos = new InfoScreens(&displayA, BTN_PIN);

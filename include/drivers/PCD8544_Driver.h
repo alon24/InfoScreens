@@ -5,8 +5,8 @@
  *      Author: iklein
  */
 
-#ifndef INCLUDE_DRIVERS_ILI9341_DRIVER_H_
-#define INCLUDE_DRIVERS_ILI9341_DRIVER_H_
+#ifndef INCLUDE_DRIVERS_PCD8544_DRIVER_H_
+#define INCLUDE_DRIVERS_PCD8544_DRIVER_H_
 
 #include <Libraries/Adafruit_PCD8544/Adafruit_PCD8544.h>
 #include <SmingCore/SmingCore.h>
@@ -45,4 +45,4 @@ public:
 	void setTextColor(uint16_t c);
 };
 
-#endif /* INCLUDE_DRIVERS_ILI9341_DRIVER_H_ */
+#endif /* INCLUDE_DRIVERS_PCD8544_DRIVER_H_ */
