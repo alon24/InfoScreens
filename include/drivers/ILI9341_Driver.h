@@ -1,20 +1,20 @@
 /*
- * SSD1306_Driver.h
+ * ILI9341_Driver.h
  *
- *  Created on: Aug 17, 2015
- *      Author: ilan
+ *  Created on: Dec 6, 2015
+ *      Author: iklein
  */
 
-#ifndef INCLUDE_SSD1306_DRIVER_H_
-#define INCLUDE_SSD1306_DRIVER_H_
+#ifndef INCLUDE_DRIVERS_ILI9341_DRIVER_H_
+#define INCLUDE_DRIVERS_ILI9341_DRIVER_H_
 
-#include <Libraries/Adafruit_SSD1306/Adafruit_SSD1306.h>
+#include <Libraries/Adafruit_ILI9341/Adafruit_ILI9341.h>
 #include <SmingCore/SmingCore.h>
 #include "Base_Display_Driver.h"
 
-class SSD1306_Driver: public Base_Display_Driver, public Adafruit_SSD1306 {
+class ILI9341_Driver: public Base_Display_Driver, public Adafruit_ILI9341 {
 public:
-	SSD1306_Driver(int8_t RST);
+	ILI9341_Driver();
 	void init();
 	int16_t getCursorX();
 	int16_t getCursorY();
@@ -37,4 +37,5 @@ public:
 	void setTextSize(uint8_t s);
 	void setTextColor(uint16_t c);
 };
-#endif /* INCLUDE_SSD1306_DRIVER_H_ */
+
+#endif /* INCLUDE_DRIVERS_ILI9341_DRIVER_H_ */

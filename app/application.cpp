@@ -1,6 +1,8 @@
 #include <user_config.h>
 #include <SmingCore/SmingCore.h>
 #include <drivers/SSD1306_driver.h>
+//#include <drivers/ILI9341_driver.h>
+//#include <drivers/PCD8544_driver.h>
 
 #include <InfoScreens.h>
 #include <utils.h>
@@ -11,8 +13,15 @@
 #define sclPin 5
 #define sdaPin 4
 
+#define rotaryBtnPin 13
+#define rotaryClkPin 14
+#define rotaryDtPin 12
+
+//pins for spi
+//#define clk 15
+
 //* SSD1306 - I2C
-SSD1306_Driver display(4);
+Base_Display_Driver* display;
 
 Timer procTimer;
 bool state = true;
@@ -102,17 +111,19 @@ void init()
 	Serial.begin(SERIAL_BAUD_RATE); // 115200
 	Serial.systemDebugOutput(true); // Debug output to serial
 	Wire.pins(sclPin, sdaPin);
+	display = new SSD1306_Driver(4);
+//	display = new ILI9341_Driver();
+//	display = new PCD8544_Driver(13,14,15,4,5);
 
-	display.begin(SSD1306_SWITCHCAPVCC);
-	display.clearDisplay();
+	display->init();
 
-	display.setTextSize(1);
-	display.setTextColor(WHITE);
-
-	infos = new InfoScreens(&display, BTN_PIN);
+//	infos = new InfoScreens(&displayA, BTN_PIN);
+	infos = new InfoScreens(display);
 	initInfoScreens();
+	infos->initMFButton(BTN_PIN);
+//	infos->initRotary(rotaryBtnPin, rotaryClkPin, rotaryDtPin );
 	infos->show();
-
+//
 	updater.initializeMs(300, handleUpdateTimer).start();
 	updater2.initializeMs(120, handle2UpdateTimer).start();
 

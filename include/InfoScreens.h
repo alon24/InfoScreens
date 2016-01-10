@@ -9,11 +9,12 @@
 #define INCLUDE_INFOSCREENS_H_
 
 #include <SmingCore/SmingCore.h>
-#include <drivers/SSD1306_Driver.h>
+
+#include "drivers/Base_Display_Driver.h"
 #include "utils/MultiFunctionButton.h"
+#include "utils/Rotary2.h"
 
 struct paramDataValues {
-	//TODO:ilan maybe have Vector<String*>
 	Vector<String*> data;
 	int currentDataIndex = -1;
 
@@ -134,7 +135,8 @@ class BaseInfoElement
 protected:
 	String id;
 	BaseInfoElement* parent;
-	SSD1306_Driver* display;
+//	SSD1306_Driver* display;
+	Base_Display_Driver* display;
 
 public:
 	//Simplified constructor because not all elements need id
@@ -144,7 +146,8 @@ public:
 		this->id = id;
 	};
 
-	void setDisplay(SSD1306_Driver* disp) {
+	void setDisplay(Base_Display_Driver* disp) {
+//		debugf("111");
 		this->display = disp;
 	}
 
@@ -281,17 +284,23 @@ private:
 	bool updateDisplay = false;
 	bool internalCanUpdateDisplay = true;
 	Timer screenUpdateTimer;
-	int btnPin=0;
 	long lastClickTime = 0;
 	int waitTimeForClick = 200;
-	MultiFunctionButton btn;
+	MultiFunctionButton* btn = NULL;
+	Rotary* rotary = NULL;
 	ViewMode viewMode = ViewMode::INFO;
 
 	MenuEventDelegate delegatedMenuEvent;
 	EditModeBlinkingInfo editModeBlinkInfo;
 public:
 
-	InfoScreens(SSD1306_Driver *dis, int btnPin);
+	InfoScreens(Base_Display_Driver *dis, int btnPin);
+	InfoScreens(Base_Display_Driver *dis);
+
+	~InfoScreens();
+	void initMFButton(int btnPin);
+	void initRotary(int btnPin, int encoderCLK, int encoderDT);
+
 	InfoPage* createPage(String header);
 	void addPage(InfoPage* page);
 	void show();
@@ -316,6 +325,8 @@ public:
 	void editModeBtnClicked(MultiFunctionButtonAction event);
 	void editFieldModeBtnClicked(MultiFunctionButtonAction event);
 	void setOnMenuEventDelegate(MenuEventDelegate handler);
+
+	void rotaryWheelMoved(RotaryAction event);
 
 private:
 	void handleScreenUpdateTimer();

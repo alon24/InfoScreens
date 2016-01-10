@@ -276,22 +276,59 @@ paramData InfoPage::getParamText(String id){
 	return parent->getParamText(id);
 }
 
-InfoScreens::InfoScreens(SSD1306_Driver *dis, int btnPin) : BaseInfoElement::BaseInfoElement()
+InfoScreens::InfoScreens(Base_Display_Driver *dis, int btnPin) : BaseInfoElement::BaseInfoElement()
 {
 	this->display = dis;
 	setCurrent(0);
 
-	this->btnPin = btnPin;
-	btn.initBtn(btnPin);
-	btn.enableClickAndHold(false);
-	btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+	initMFButton(btnPin);
 
 	screenUpdateTimer.setCallback(showScreenUpdateDelegate(&InfoScreens::handleScreenUpdateTimer, this));
 	screenUpdateTimer.setIntervalMs(80);
 	screenUpdateTimer.start(true);
 
-	display->print("InfoScreens");
-	Serial.print(display->getCursorY());
+	display->print("InfoScreens0");
+	display->display();
+}
+
+InfoScreens::InfoScreens(Base_Display_Driver *dis) : BaseInfoElement::BaseInfoElement() {
+	this->display = dis;
+	setCurrent(0);
+
+	screenUpdateTimer.setCallback(showScreenUpdateDelegate(&InfoScreens::handleScreenUpdateTimer, this));
+	screenUpdateTimer.setIntervalMs(80);
+	screenUpdateTimer.start(true);
+
+	display->clearDisplay();
+	display->print("InfoScreens1");
+	display->display();
+}
+
+InfoScreens::~InfoScreens() {
+	delete(rotary);
+	delete(btn);
+}
+
+void InfoScreens::initMFButton(int btnPin) {
+	if (btn) {
+		delete(btn);
+	}
+
+	btn = new MultiFunctionButton();
+	btn->initBtn(btnPin);
+	btn->enableClickAndHold(false);
+	btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+}
+
+void InfoScreens::initRotary(int btnPin, int encoderCLK, int encoderDT) {
+	rotary = new Rotary();
+	rotary->init(encoderCLK, encoderDT);
+
+	if (btn != NULL) {
+		delete(btn);
+	}
+	btn = rotary->initBtn(btnPin, ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this), false);
+	rotary->setOnWheelEvent(RotaryWheelActionDelegate(&InfoScreens::rotaryWheelMoved, this));
 }
 
 InfoPage* InfoScreens::createPage(String header){
@@ -315,7 +352,7 @@ void InfoScreens::show() {
 //		lastUpdateTime = millis();
 	setCanUpdateDisplay(false);
 	display->clearDisplay();
-	display->display();
+//	display->display();
 	paramValueMap["currentPage"].dirty = true;
 	setCanUpdateDisplay(true);
 }
@@ -361,18 +398,18 @@ void InfoScreens::setViewMode(ViewMode mode) {
 
 	this->viewMode = mode;
 	if(mode == ViewMode::INFO) {
-		btn.enableClickAndHold(false);
-		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+		btn->enableClickAndHold(false);
+		btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 
 	} else if(mode == ViewMode::EDIT){
-		btn.enableClickAndHold(false);
-		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
+		btn->enableClickAndHold(false);
+		btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
 		showEditParam();
 //		moveToNextEditParam();
 	}
 	else if(mode == ViewMode::EDIT_FIELD) {
-		btn.enableClickAndHold(true);
-		btn.setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editFieldModeBtnClicked, this));
+		btn->enableClickAndHold(true);
+		btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editFieldModeBtnClicked, this));
 //		moveToNextEditParam();
 	}
 
@@ -503,19 +540,21 @@ String InfoScreens::moveToNextValue() {
 //InfoScreeens private
 
 void InfoScreens::handleScreenUpdateTimer() {
+//	debugf("canUpdateDisplay=%i, internalCanUpdateDisplay=%i",canUpdateDisplay() ,internalCanUpdateDisplay );
 	if(canUpdateDisplay() && internalCanUpdateDisplay) {
 		if (mChildern.size() == 0) {
 			debugf("I cannot print anything, no Pages declared, setting to NOT update display");
 			setCanUpdateDisplay(false);
 			return;
 		}
-
+//		debugf("1");
 		if (paramValueMap["currentPage"].dirty) {
 //				debugf("currentPage = %i, paramValueMap['currentPage'].dirty= %d",paramValueMap["currentPage"].val.toInt(), (int)paramValueMap["currentPage"].dirty);
 			display->clearDisplay();
 			display->setCursor(0,0);
 			print(paramValueMap["currentPage"].val->toInt());
 			paramValueMap["currentPage"].clearDirty();
+//			debugf("2");
 		}
 		else {
 			internalCanUpdateDisplay = false;
@@ -551,19 +590,19 @@ void InfoScreens::handleScreenUpdateTimer() {
 			}
 
 			if (editModeBlinkInfo.shouldEraseLast()) {
-				drawBlinkParamLine(editModeBlinkInfo.lastSelectedParam, BLACK);
+				drawBlinkParamLine(editModeBlinkInfo.lastSelectedParam, display->getBlack());
 				editModeBlinkInfo.lastSelectedParam = NULL;
 			}
 
 			long current = millis();
-			int linecolor = BLACK;
-			int symbleColor = BLACK;
+			int linecolor = display->getBlack();
+			int symbleColor = display->getBlack();
 			editModeBlinkInfo.handleTimeElapsed(current);
 
 			if (viewMode == ViewMode::EDIT || viewMode == ViewMode::EDIT_FIELD) {
 				if (editModeBlinkInfo.blinkDrawn) {
-					linecolor = WHITE;
-					symbleColor = WHITE;
+					linecolor = display->getWhite();
+					symbleColor = display->getWhite();
 					if (viewMode == ViewMode::EDIT_FIELD){
 //						linecolor = WHITE;
 					}
@@ -577,19 +616,18 @@ void InfoScreens::handleScreenUpdateTimer() {
 					if (viewMode == ViewMode::EDIT_FIELD) {
 						display->writeover(p->t, *paramValueMap[p->id].val, true);
 						if (extraW >0) {
-							display->fillRect(p->t.x + p->t.w, p->t.y, extraW, p->t.h, WHITE);
+							display->fillRect(p->t.x + p->t.w, p->t.y, extraW, p->t.h, display->getWhite());
 						}
 					} else {
 						display->writeover(p->t, *paramValueMap[p->id].val);
 						if (extraW >0) {
-							display->fillRect(p->t.x + p->t.w, p->t.y, extraW, p->t.h, BLACK);
+							display->fillRect(p->t.x + p->t.w, p->t.y, extraW, p->t.h, display->getBlack());
 						}
 					}
 //					debugf("linecolor = %i, currnet param %s", linecolor, getCurrent()->getCurrentEditParam()->toString().c_str() );
 					drawBlinkParamLine(p, linecolor);
 				}
 
-//				if
 			}
 		}
 	}
@@ -614,7 +652,7 @@ void InfoScreens::drawEditModeSign(int x, int y, int color) {
 	}
 
 	//even if F mode clear the line
-	if (color== BLACK){
+	if (color== display->getBlack()){
 		display->drawFastHLine(x, y+4, 3, color);
 	}
 }
@@ -704,6 +742,15 @@ void InfoScreens::editFieldModeBtnClicked(MultiFunctionButtonAction event)
 
 void InfoScreens::setOnMenuEventDelegate(MenuEventDelegate handler) {
 	delegatedMenuEvent  = handler;
+}
+
+void InfoScreens::rotaryWheelMoved(RotaryAction event) {
+//	debugf("rotary change %i", event);
+	if (event == RotaryAction::NEXT) {
+		moveRight();
+	} else {
+		moveLeft();
+	}
 }
 
 void InfoScreens::setCurrent(int index) {
