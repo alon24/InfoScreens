@@ -108,7 +108,7 @@ void handle2UpdateTimer() {
 
 void init()
 {
-	Serial.begin(SERIAL_BAUD_RATE); // 115200
+	Serial.begin(115200); // 115200
 	Serial.systemDebugOutput(true); // Debug output to serial
 	Wire.pins(sclPin, sdaPin);
 	display = new SSD1306_Driver(4);

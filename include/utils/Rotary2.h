@@ -9,7 +9,7 @@
 #define INCLUDE_UTILS_ROTARY_H_
 
 #include <user_config.h>
-#include <SmingCore/SmingCore.h>
+//#include <SmingCore/SmingCore.h>
 #include "utils/MultiFunctionButton.h"
 
 enum class RotaryAction {
