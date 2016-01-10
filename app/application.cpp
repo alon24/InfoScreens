@@ -1,5 +1,5 @@
 #include <user_config.h>
-#include <SmingCore/SmingCore.h>
+//#include <SmingCore/SmingCore.h>
 #include <drivers/SSD1306_driver.h>
 //#include <drivers/ILI9341_driver.h>
 //#include <drivers/PCD8544_driver.h>

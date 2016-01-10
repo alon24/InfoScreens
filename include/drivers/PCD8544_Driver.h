@@ -9,7 +9,7 @@
 #define INCLUDE_DRIVERS_PCD8544_DRIVER_H_
 
 #include <Libraries/Adafruit_PCD8544/Adafruit_PCD8544.h>
-#include <SmingCore/SmingCore.h>
+//#include <SmingCore/SmingCore.h>
 #include "Base_Display_Driver.h"
 
 class PCD8544_Driver: public Base_Display_Driver, public Adafruit_PCD8544 {
