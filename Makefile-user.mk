@@ -28,3 +28,5 @@ MODULES ?= app app/drivers
 
 # Com port speed
 COM_SPEED	= 961000
+
+ESPTOOL      ?= $(ESP_HOME)/utils/esptool.py

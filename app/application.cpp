@@ -1,4 +1,3 @@
-#include <user_config.h>
 //#include <SmingCore/SmingCore.h>
 #include <drivers/SSD1306_driver.h>
 //#include <drivers/ILI9341_driver.h>
@@ -120,8 +119,8 @@ void init()
 //	infos = new InfoScreens(&displayA, BTN_PIN);
 	infos = new InfoScreens(display);
 	initInfoScreens();
-	infos->initMFButton(BTN_PIN);
-//	infos->initRotary(rotaryBtnPin, rotaryClkPin, rotaryDtPin );
+//	infos->initMFButton(BTN_PIN);
+	infos->initRotary(rotaryBtnPin, rotaryClkPin, rotaryDtPin );
 	infos->show();
 //
 	updater.initializeMs(300, handleUpdateTimer).start();

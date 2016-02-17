@@ -12,7 +12,7 @@
 
 #include "drivers/Base_Display_Driver.h"
 #include "utils/MultiFunctionButton.h"
-#include "utils/Rotary2.h"
+#include "utils/Rotary.h"
 
 struct paramDataValues {
 	Vector<String*> data;

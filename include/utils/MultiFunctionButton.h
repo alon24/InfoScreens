@@ -8,8 +8,7 @@
  *      Author: ilan
  */
 
-#include <user_config.h>
-#include <SmingCore.h>
+#include "SmingCore.h"
 
 //This class makes use of:
 /* 4-Way Button:  Click, Double-Click, Press+Hold, and Press+Long-Hold Test Sketch

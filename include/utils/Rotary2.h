@@ -8,8 +8,7 @@
 #ifndef INCLUDE_UTILS_ROTARY_H_
 #define INCLUDE_UTILS_ROTARY_H_
 
-#include <user_config.h>
-//#include <SmingCore/SmingCore.h>
+#include "SmingCore.h"
 #include "utils/MultiFunctionButton.h"
 
 enum class RotaryAction {
@@ -96,7 +95,7 @@ public:
 			rotaryHalfSteps--;
 
 		showResult();
-//		debugf("%i",rotaryHalfSteps);
+		debugf("%i",rotaryHalfSteps);
 		}
 
 	void int1()
@@ -108,7 +107,7 @@ public:
 		if ( int1history==int1signal )
 			return;
 		int1time = micros();
-//		debugf("%i",rotaryHalfSteps);
+		debugf("%i",rotaryHalfSteps);
 		}
 
 	void showResult() {
