@@ -57,8 +57,8 @@ public:
 		this->encoderCLK = encoderCLK;
 		this->encoderDT = encoderDT;
 
-		attachInterrupt(encoderCLK, RotaryButtonActionDelegate(&Rotary::updateEncoder, this), CHANGE);
-		attachInterrupt(encoderDT, RotaryButtonActionDelegate(&Rotary::updateEncoder, this), CHANGE);
+		attachInterrupt(encoderCLK, RotaryButtonActionDelegate(&Rotary::updateEncoder, this), (GPIO_INT_TYPE)GPIO_PIN_INTR_ANYEDGE);
+		attachInterrupt(encoderDT, RotaryButtonActionDelegate(&Rotary::updateEncoder, this), (GPIO_INT_TYPE)GPIO_PIN_INTR_ANYEDGE);
 	};
 
 	MultiFunctionButton* initBtn(int buttonPin, ButtonActionDelegate handler = null, bool pressAndHold = true) {
@@ -89,7 +89,6 @@ public:
 //			return;
 //		}
 //		lastReadTime = current;
-
 		int MSB = digitalRead(encoderCLK); //MSB = most significant bit
 		int LSB = digitalRead(encoderDT); //LSB = least significant bit
 

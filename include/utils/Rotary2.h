@@ -76,8 +76,8 @@ public:
 		this->encoderCLK = encoderCLK;
 		this->encoderDT = encoderDT;
 
-		attachInterrupt(encoderCLK, RotaryButtonActionDelegate(&Rotary::int0, this), CHANGE);
-		attachInterrupt(encoderDT, RotaryButtonActionDelegate(&Rotary::int1, this), CHANGE);
+		attachInterrupt(encoderCLK, RotaryButtonActionDelegate(&Rotary::int0, this), (GPIO_INT_TYPE)GPIO_PIN_INTR_ANYEDGE);
+		attachInterrupt(encoderDT, RotaryButtonActionDelegate(&Rotary::int1, this), (GPIO_INT_TYPE)GPIO_PIN_INTR_ANYEDGE);
 	};
 
 	void int0()
