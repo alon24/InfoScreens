@@ -182,4 +182,11 @@ void enablePressAndHold(bool pressAndHold)
 //Delegated call when event is triggered </br>
 void setOnButtonEvent(ButtonActionDelegate handler)
 
+#### Videos
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/i1Nsj3o-vv0/0.jpg)](https://www.youtube.com/watch?v=i1Nsj3o-vv0)
+
+
+### License and credits
+
+Infoscreens is licensed under Apache 2.0.
+Developed by htpcfreak@gmail.com (alon24)
