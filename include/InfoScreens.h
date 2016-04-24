@@ -270,9 +270,16 @@ struct EditModeBlinkingInfo{
 enum InfoScreenMenuAction { InfoParamDataSet = 0, InfoNextValue = 1, InfoNextParam =2};
 /**
  * Delegate for menu handling before change is done.
- * the return value represents consumeable
+ * the return value represents consumable
  */
 typedef Delegate<bool(paramStruct* data, ViewMode v, InfoScreenMenuAction actionType, String newValue)> MenuEventDelegate;
+
+class MenuHandlerInterface {
+	void infoModeBtnClicked(MultiFunctionButtonAction event);
+	void editModeBtnClicked(MultiFunctionButtonAction event);
+	void editFieldModeBtnClicked(MultiFunctionButtonAction event);
+	void setOnMenuEventDelegate(MenuEventDelegate handler);
+};
 
 class InfoScreens : public BaseInfoElement{
 
@@ -329,6 +336,8 @@ public:
 	void rotaryWheelMoved(RotaryAction event);
 
 private:
+	MenuHandlerInterface menuHandler;
+
 	void handleScreenUpdateTimer();
 	void print(int pIndex);
 	void setCurrent(int index);

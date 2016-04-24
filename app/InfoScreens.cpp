@@ -49,10 +49,12 @@ paramStruct* InfoLine::addParam(String id, String text, bool editable, int maxLi
 {
 	paramStruct* ret = new paramStruct();
 //	getParent()->updateParamValue(id, text);
-	if( text == "") {
-	} else {
-		updateParamValue(id, text);
-	}
+
+	updateParamValue(id, text);
+//	if( text == "") {
+//	} else {
+//		updateParamValue(id, text);
+//	}
 
 //	ret->text = text;
 	ret->t.x = -1;
@@ -420,22 +422,22 @@ bool InfoScreens::checkEditModeAvailble() {
 }
 
 void InfoScreens::moveRight() {
-//		debugf("start mem %d",system_get_free_heap_size());
+		debugf("start mem %d",system_get_free_heap_size());
 	if (mChildern.size() == 1) {
 		return;
 	}
 
-////		debugf("moveRight mills=%lu", lastUpdateTime);
+//		debugf("moveRight mills=%lu", lastUpdateTime);
 	int current = paramValueMap["currentPage"].val->toInt();
 
-//		debugf("moveRight mCurrent=%i" , current);
+		debugf("moveRight mCurrent=%i" , current);
 	if (current + 1 < mChildern.size()) {
 		current++;
 	}
 	else {
 		current = 0;
 	}
-//		debugf("moveRight mCurrent after=%i" , current);
+		debugf("moveRight mCurrent after=%i" , current);
 	paramValueMap["currentPage"].update(String(current));
 //		debugf("end mem %d",system_get_free_heap_size());
 }
@@ -554,7 +556,8 @@ void InfoScreens::handleScreenUpdateTimer() {
 			display->setCursor(0,0);
 			print(paramValueMap["currentPage"].val->toInt());
 			paramValueMap["currentPage"].clearDirty();
-//			debugf("2");
+			debugf("CurPage=%i", paramValueMap["currentPage"].val->toInt() );
+			display->display();
 		}
 		else {
 			internalCanUpdateDisplay = false;
@@ -627,7 +630,8 @@ void InfoScreens::handleScreenUpdateTimer() {
 //					debugf("linecolor = %i, currnet param %s", linecolor, getCurrent()->getCurrentEditParam()->toString().c_str() );
 					drawBlinkParamLine(p, linecolor);
 				}
-
+				//todo:ilan
+				display->display();
 			}
 		}
 	}
@@ -671,7 +675,7 @@ void InfoScreens::infoModeBtnClicked(MultiFunctionButtonAction event)
 {
 	switch (event) {
 		case BTN_CLICK:
-//			debugf("click");
+			debugf("click");
 			moveRight();
 			break;
 		case BTN_DOUBLE_CLICK:

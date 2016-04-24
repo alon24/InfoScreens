@@ -51,8 +51,10 @@ public:
 	MultiFunctionButton(int buttonPin, ButtonActionDelegate handler = null, bool pressAndHold = true)
 	{
 		m_buttonPin = buttonPin;
+//		pinMode(m_buttonPin, INPUT);
 		this->delegatedActionEvent = handler;
 		if (handler) {
+			debugf("MultiFunctionButton, setting handler");
 			buttonTimer.initializeMs(80, TimerDelegate(&MultiFunctionButton::actOnButton, this)).start();
 		}
 
@@ -62,11 +64,13 @@ public:
 	// init to set button, handler is optional here
 	void initBtn(int buttonPin, ButtonActionDelegate handler = null, bool pressAndHold = true) {
 		m_buttonPin = buttonPin;
+		pinMode(m_buttonPin, INPUT);
 		if (handler) {
 			setOnButtonEvent(handler);
 		}
 
 		enableClickAndHold(pressAndHold);
+		debugf("***** initBtn:%s",String(buttonPin).c_str());
 	}
 
 	void enableClickAndHold(bool pressAndHold) {
@@ -79,6 +83,7 @@ public:
 		delegatedActionEvent  = handler;
 		inResetMode = true;
 		if (!buttonTimer.isStarted()) {
+			debugf("setOnButtonEvent, starting buttonTimer");
 			buttonTimer.initializeMs(80, TimerDelegate(&MultiFunctionButton::actOnButton, this)).start();
 		}
 	}
@@ -176,7 +181,6 @@ public:
 				}
 			}
 		}
-
 		buttonLast = buttonVal;
 		return event;
 	}
@@ -203,7 +207,6 @@ public:
 				act = BTN_TRIPPLE_CLICK;
 				break;
 		}
-
 		if ((b==1 || b==2 || b==3 || b==4 || b==5) && delegatedActionEvent) {
 			delegatedActionEvent(act);
 		}

@@ -9,8 +9,11 @@
 #define LED_PIN 2 // GPIO2
 #define BTN_PIN 0
 
-#define sclPin 5
-#define sdaPin 4
+//#define sclPin 5
+//#define sdaPin 4
+
+#define sclPin 13
+#define sdaPin 14
 
 #define rotaryBtnPin 13
 #define rotaryClkPin 14
@@ -93,6 +96,29 @@ void initInfoScreens() {
 
     // set a function to get screen info callback (with the ability to consume events)
     infos->setOnMenuEventDelegate(menuEventLister);
+
+//	// Add a new Page
+//		InfoPage* p1 = infos->createPage("Main");
+//		//Add a line item
+//		p1->createLine("Network")->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
+//		InfoLine *apLine = p1->createLine("ap ");
+//		apLine->addParam("apState", "on: ", true, 4);
+//		apLine->addParam("apIp", "Not Connected");
+//
+//		InfoLine* staLine = p1->createLine("ssid: ");
+//		staLine->addParam("staState", "off:");
+//		InfoLine* lsta = p1->createLine("sta:");
+////		lsta->addParam("stationIP1", "");
+//		lsta->addParam("stationIP1", "", false, 8);
+//
+//		InfoPage* p2 = infos->createPage("P2");
+//		InfoLine* el2 = p2->createLine("P2Test");
+//		//add the time param
+//		el2->addParam("time", currentTime)->t.x = getXOnScreenForString(currentTime, 1);
+//
+//		p2->createLine("sta:")->addParam("station")->setEditable(true)->setMaxLineSize(6);
+//		InfoLine* el22 = p2->createLine("apdd: ");
+//		el22->addParam("ap");
 }
 
 void handleUpdateTimer() {
@@ -104,13 +130,44 @@ void handleUpdateTimer() {
 void handle2UpdateTimer() {
 	infos->updateParamValue("ap", String(millis()));
 }
+Timer DemoTimer;
+
+void Demo2()
+{
+	Serial.println("Display: some text");
+	display->clearDisplay();
+	// text display tests
+	display->setTextSize(1);
+	display->setTextColor(WHITE);
+	display->setCursor(0,0);
+	display->print("Sming Framework");
+//	display->setTextColor(BLACK, WHITE); // 'inverted' text
+	display->setCursor(104, 7);
+	display->print("v1.0");
+	//----
+	display->setTextColor(WHITE);
+	display->print("Let's do smart things");
+	display->setTextSize(3);
+	display->print("IoT");
+	display->display();
+	DemoTimer.stop();      // Finish demo
+}
+Timer btnTimer;
+
+void doCheckBtn() {
+	if (digitalRead(BTN_PIN) == HIGH) {
+		debugf("btn High");
+	} else {
+		debugf("btn LOW");
+	}
+}
 
 void init()
 {
-	Serial.begin(115200); // 115200
+	Serial.begin(74880); // 115200
 	Serial.systemDebugOutput(true); // Debug output to serial
 	Wire.pins(sclPin, sdaPin);
-	display = new SSD1306_Driver(4);
+	display = new SSD1306_Driver(16);
 //	display = new ILI9341_Driver();
 //	display = new PCD8544_Driver(13,14,15,4,5);
 
@@ -119,11 +176,19 @@ void init()
 //	infos = new InfoScreens(&displayA, BTN_PIN);
 	infos = new InfoScreens(display);
 	initInfoScreens();
-//	infos->initMFButton(BTN_PIN);
-	infos->initRotary(rotaryBtnPin, rotaryClkPin, rotaryDtPin );
+	infos->initMFButton(BTN_PIN);
+//	pinMode(BTN_PIN, INPUT);
+//	btnTimer.initializeMs(80, doCheckBtn).start(true);
+
+//	infos->initRotary(rotaryBtnPin, rotaryClkPin, rotaryDtPin );
+
 	infos->show();
+	WifiStation.enable(false);
+//	WifiAccessPoint.enable(false);
+
+//	DemoTimer.initializeMs(2000, Demo2).start();
 //
-	updater.initializeMs(300, handleUpdateTimer).start();
-	updater2.initializeMs(120, handle2UpdateTimer).start();
+//	updater.initializeMs(300, handleUpdateTimer).start();
+//	updater2.initializeMs(120, handle2UpdateTimer).start();
 
 }
