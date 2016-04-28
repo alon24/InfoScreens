@@ -41,6 +41,19 @@ struct paramDataValues {
 		return data.elementAt(index);
 	}
 
+	String* getPrevData() {
+		if (data.size() == 0)
+			return null;
+
+		int tmp = currentDataIndex;
+		tmp--;
+		if (tmp < 0) {
+			tmp = data.size() -1;
+		}
+		currentDataIndex = tmp;
+		return data.elementAt(currentDataIndex);
+	}
+
 	String* getNextData() {
 		if (data.size() == 0)
 			return null;
@@ -209,6 +222,7 @@ public:
 
 	paramStruct* getCurrentEditParam();
 	paramStruct* movetoNextEditParam();
+	paramStruct* movetoPrevEditParam();
 
 	void initEdit();
 	void addElemenet(InfoLine* el);
@@ -267,7 +281,7 @@ struct EditModeBlinkingInfo{
 	paramStruct* lastSelectedParam = NULL;
 };
 
-enum InfoScreenMenuAction { InfoParamDataSet = 0, InfoNextValue = 1, InfoNextParam =2};
+enum InfoScreenMenuAction { InfoParamDataSet = 0, InfoPrevValue = 1, InfoNextValue = 2, InfoPrevParam = 3, InfoNextParam = 4};
 /**
  * Delegate for menu handling before change is done.
  * the return value represents consumable
@@ -275,10 +289,11 @@ enum InfoScreenMenuAction { InfoParamDataSet = 0, InfoNextValue = 1, InfoNextPar
 typedef Delegate<bool(paramStruct* data, ViewMode v, InfoScreenMenuAction actionType, String newValue)> MenuEventDelegate;
 
 class MenuHandlerInterface {
-	void infoModeBtnClicked(MultiFunctionButtonAction event);
-	void editModeBtnClicked(MultiFunctionButtonAction event);
-	void editFieldModeBtnClicked(MultiFunctionButtonAction event);
-	void setOnMenuEventDelegate(MenuEventDelegate handler);
+public:
+	virtual void infoModeBtnClicked(MultiFunctionButtonAction event);
+	virtual void editModeBtnClicked(MultiFunctionButtonAction event);
+	virtual void editFieldModeBtnClicked(MultiFunctionButtonAction event);
+	virtual void setOnMenuEventDelegate(MenuEventDelegate handler);
 };
 
 class InfoScreens : public BaseInfoElement{
@@ -300,7 +315,7 @@ private:
 	MenuEventDelegate delegatedMenuEvent;
 	EditModeBlinkingInfo editModeBlinkInfo;
 public:
-
+	MenuHandlerInterface *menuHandler;
 	InfoScreens(Base_Display_Driver *dis, int btnPin);
 	InfoScreens(Base_Display_Driver *dis);
 
@@ -325,24 +340,29 @@ public:
 	void setViewMode(ViewMode mode);
 	bool checkEditModeAvailble();
 	paramStruct* moveToNextEditParam();
+	paramStruct* moveToPrevEditParam();
 	paramStruct* showEditParam();
+	String moveToPrevValue();
 	String moveToNextValue();
 
-	void infoModeBtnClicked(MultiFunctionButtonAction event);
-	void editModeBtnClicked(MultiFunctionButtonAction event);
-	void editFieldModeBtnClicked(MultiFunctionButtonAction event);
-	void setOnMenuEventDelegate(MenuEventDelegate handler);
+	ViewMode getViewMode();
 
+	void setOnMenuEventDelegate(MenuEventDelegate handler);
 	void rotaryWheelMoved(RotaryAction event);
 
+
 private:
-	MenuHandlerInterface menuHandler;
 
 	void handleScreenUpdateTimer();
 	void print(int pIndex);
 	void setCurrent(int index);
 	void drawEditModeSign(int x, int y, int color);
 	void drawBlinkParamLine(paramStruct* p, int color);
+
+	void infoModeBtnClicked(MultiFunctionButtonAction event);
+	void editModeBtnClicked(MultiFunctionButtonAction event);
+	void editFieldModeBtnClicked(MultiFunctionButtonAction event);
+
 };
 
 #endif /* INCLUDE_INFOSCREENS_H_ */

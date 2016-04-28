@@ -206,6 +206,16 @@ paramStruct* InfoPage::movetoNextEditParam(){
 	return v.get(currentEditedParam);
 }
 
+paramStruct* InfoPage::movetoPrevEditParam(){
+	Vector<paramStruct*> v = getallEditableParams();
+	currentEditedParam--;
+	if (currentEditedParam < 0){
+		currentEditedParam = v.size()-1;
+	}
+//	debugf("getNextEditParam next param is %i", currentEditedParam);
+	return v.get(currentEditedParam);
+}
+
 void  InfoPage::initEdit() {
 	currentEditedParam = -1;
 }
@@ -319,6 +329,8 @@ void InfoScreens::initMFButton(int btnPin) {
 	btn = new MultiFunctionButton();
 	btn->initBtn(btnPin);
 	btn->enableClickAndHold(false);
+//	btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+
 	btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 }
 
@@ -417,6 +429,10 @@ void InfoScreens::setViewMode(ViewMode mode) {
 
 }
 
+ViewMode InfoScreens::getViewMode() {
+	return viewMode;
+}
+
 bool InfoScreens::checkEditModeAvailble() {
 	return getCurrent()->checkEditModeAvailble();
 }
@@ -499,6 +515,58 @@ paramStruct* InfoScreens::moveToNextEditParam(){
 	}
 	paramStruct* ret = getCurrent()->movetoNextEditParam();
 	editModeBlinkInfo.reset();
+	return ret;
+}
+
+paramStruct* InfoScreens::moveToPrevEditParam(){
+	editModeBlinkInfo.setLastSelected(getCurrent()->getCurrentEditParam());
+//	editModeInfo.setLastSelected(getCurrent()->getCurrentEditParam());
+
+	if(delegatedMenuEvent) {
+		if (delegatedMenuEvent(getCurrent()->getCurrentEditParam(), viewMode, InfoPrevParam, "")) {
+//			debugf("moveToNextEditParam delegate consumed");
+			return NULL;
+		}
+	}
+	paramStruct* ret = getCurrent()->movetoPrevEditParam();
+	editModeBlinkInfo.reset();
+	return ret;
+}
+
+String InfoScreens::moveToPrevValue() {
+	String ret;
+	paramStruct* param = getCurrent()->getCurrentEditParam();
+	String id = param->id;
+	//temp value
+	ret = *paramValueMap[param->id].val;
+
+//	debugf("InfoScreens::moveToNextValue %s, %s", id.c_str());
+	if (!paramEditValueMap.contains(id)) {
+		if(delegatedMenuEvent) {
+			if (delegatedMenuEvent(param, viewMode, InfoNextValue, "")) {
+//				debugf("moveToNextValue delegate consumed");
+			}
+			else {
+				debugf("no more data");
+			}
+		}
+
+		return ret;
+	}
+
+	paramDataValues* data =  paramEditValueMap[id];
+	if (data == NULL) {
+		debugf("data is null");
+	}
+	String* d = data->getPrevData();
+	if(delegatedMenuEvent) {
+		if (delegatedMenuEvent(param, viewMode, InfoPrevValue, *d)) {
+//			debugf("moveToNextValue delegate consumed");
+			return "";
+		}
+	}
+	updateParamValue(id, *d);
+//	debugf("next data for %s, %s", id.c_str(), d->c_str());
 	return ret;
 }
 
@@ -673,75 +741,84 @@ void InfoScreens::print(int pIndex) {
 
 void InfoScreens::infoModeBtnClicked(MultiFunctionButtonAction event)
 {
-	switch (event) {
-		case BTN_CLICK:
-			debugf("click");
-			moveRight();
-			break;
-		case BTN_DOUBLE_CLICK:
-//			debugf("BTN_DOUBLE_CLICK");
-			moveLeft();
-			break;
-		case BTN_LONG_CLICK:
-//			debugf("BTN_LONG_CLICK, going to edit mode, %i", getCurrent()->getallEditableParams().size());
-
-			if(getCurrent()->getallEditableParams().size() != 0) {
-				setViewMode(ViewMode::EDIT);
-			}
-			break;
-		case BTN_HOLD_CLICK:
-//			debugf("BTN_HOLD_CLICK, going to edit mode");
-			break;
+	if (menuHandler) {
+		menuHandler->infoModeBtnClicked(event);
 	}
+//	switch (event) {
+//		case BTN_CLICK:
+//			debugf("click");
+//			moveRight();
+//			break;
+//		case BTN_DOUBLE_CLICK:
+////			debugf("BTN_DOUBLE_CLICK");
+//			moveLeft();
+//			break;
+//		case BTN_LONG_CLICK:
+////			debugf("BTN_LONG_CLICK, going to edit mode, %i", getCurrent()->getallEditableParams().size());
+//
+//			if(getCurrent()->getallEditableParams().size() != 0) {
+//				setViewMode(ViewMode::EDIT);
+//			}
+//			break;
+//		case BTN_HOLD_CLICK:
+////			debugf("BTN_HOLD_CLICK, going to edit mode");
+//			break;
+//	}
 }
 
 void InfoScreens::editModeBtnClicked(MultiFunctionButtonAction event)
 {
-	switch (event) {
-		case BTN_CLICK:
-			debugf("edit - click");
-			moveToNextEditParam();
-//			moveRight();
-//				handleClick();
-			break;
-		case BTN_DOUBLE_CLICK:
-//			debugf("return to View mode");
-			setViewMode(ViewMode::INFO);
-			show();
-//			moveLeft();
-//				handleDoubleClick();
-			break;
-		case BTN_LONG_CLICK:
-//			debugf("edit - BTN_LONG_CLICK");
-			setViewMode(ViewMode::EDIT_FIELD);
-//				handleHoldClick();
-			break;
-		case BTN_HOLD_CLICK:
-			debugf("BTN_HOLD_CLICK");
-			break;
+	if (menuHandler) {
+		menuHandler->editModeBtnClicked(event);
 	}
+//	switch (event) {
+//		case BTN_CLICK:
+//			debugf("edit - click");
+//			moveToNextEditParam();
+////			moveRight();
+////				handleClick();
+//			break;
+//		case BTN_DOUBLE_CLICK:
+////			debugf("return to View mode");
+//			setViewMode(ViewMode::INFO);
+//			show();
+////			moveLeft();
+////				handleDoubleClick();
+//			break;
+//		case BTN_LONG_CLICK:
+////			debugf("edit - BTN_LONG_CLICK");
+//			setViewMode(ViewMode::EDIT_FIELD);
+////				handleHoldClick();
+//			break;
+//		case BTN_HOLD_CLICK:
+//			debugf("BTN_HOLD_CLICK");
+//			break;
+//	}
 }
 
 void InfoScreens::editFieldModeBtnClicked(MultiFunctionButtonAction event)
 {
-	switch (event) {
-		case BTN_CLICK:
-//			debugf("editField - click");
-			moveToNextValue();
-			break;
-		case BTN_DOUBLE_CLICK:
-//			debugf("editField - return to View mode");
-			if(delegatedMenuEvent) {
-				String id = getCurrent()->getCurrentEditParam()->id;
-				String newVal = *paramValueMap[id].val;
-				if (delegatedMenuEvent(getCurrent()->getCurrentEditParam(), viewMode, InfoParamDataSet, newVal)) {
-//					debugf("InfoParamDataSet delegate consumed");
-					return;
-				}
-			}
-			setViewMode(ViewMode::EDIT);
-			break;
+	if (menuHandler) {
+		menuHandler->editFieldModeBtnClicked(event);
 	}
+//	switch (event) {
+//		case BTN_CLICK:
+////			debugf("editField - click");
+//			moveToNextValue();
+//			break;
+//		case BTN_DOUBLE_CLICK:
+////			debugf("editField - return to View mode");
+//			if(delegatedMenuEvent) {
+//				String id = getCurrent()->getCurrentEditParam()->id;
+//				String newVal = *paramValueMap[id].val;
+//				if (delegatedMenuEvent(getCurrent()->getCurrentEditParam(), viewMode, InfoParamDataSet, newVal)) {
+////					debugf("InfoParamDataSet delegate consumed");
+//					return;
+//				}
+//			}
+//			setViewMode(ViewMode::EDIT);
+//			break;
+//	}
 }
 
 void InfoScreens::setOnMenuEventDelegate(MenuEventDelegate handler) {
