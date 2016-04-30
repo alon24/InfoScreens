@@ -288,31 +288,33 @@ paramData InfoPage::getParamText(String id){
 	return parent->getParamText(id);
 }
 
-InfoScreens::InfoScreens(Base_Display_Driver *dis, int btnPin) : BaseInfoElement::BaseInfoElement()
+InfoScreens::InfoScreens(Base_Display_Driver *dis, int btnPin) : InfoScreens(dis)
 {
-	this->display = dis;
-	setCurrent(0);
 
+//	this->display = dis;
+//	setCurrent(0);
+//
 	initMFButton(btnPin);
-
-	screenUpdateTimer.setCallback(showScreenUpdateDelegate(&InfoScreens::handleScreenUpdateTimer, this));
-	screenUpdateTimer.setIntervalMs(80);
-	screenUpdateTimer.start(true);
-
-	display->print("InfoScreens0");
-	display->display();
+//
+//	screenUpdateTimer.setCallback(showScreenUpdateDelegate(&InfoScreens::handleScreenUpdateTimer, this));
+//	screenUpdateTimer.setIntervalMs(80);
+//	screenUpdateTimer.start(true);
+//
+//	display->print("InfoScreens0");
+//	display->display();
 }
 
 InfoScreens::InfoScreens(Base_Display_Driver *dis) : BaseInfoElement::BaseInfoElement() {
 	this->display = dis;
 	setCurrent(0);
 
+	menuHandler = new ThreeSecondMenuHandler(this);
 	screenUpdateTimer.setCallback(showScreenUpdateDelegate(&InfoScreens::handleScreenUpdateTimer, this));
 	screenUpdateTimer.setIntervalMs(80);
 	screenUpdateTimer.start(true);
 
 	display->clearDisplay();
-	display->print("InfoScreens1");
+//	display->print("InfoScreens1");
 	display->display();
 }
 
@@ -330,8 +332,23 @@ void InfoScreens::initMFButton(int btnPin) {
 	btn->initBtn(btnPin);
 	btn->enableClickAndHold(false);
 //	btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+	btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::handleButtonPress, this));
+}
 
-	btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+void InfoScreens::handleButtonPress(MultiFunctionButtonAction event) {
+	if (menuHandler) {
+		switch (getViewMode()) {
+		case ViewMode::INFO:
+			menuHandler->infoModeBtnClicked(event);
+			break;
+		case ViewMode::EDIT:
+			menuHandler->editModeBtnClicked(event);
+			break;
+		case ViewMode::EDIT_FIELD:
+			menuHandler->editFieldModeBtnClicked(event);
+			break;
+		}
+	}
 }
 
 void InfoScreens::initRotary(int btnPin, int encoderCLK, int encoderDT) {
@@ -341,7 +358,9 @@ void InfoScreens::initRotary(int btnPin, int encoderCLK, int encoderDT) {
 	if (btn != NULL) {
 		delete(btn);
 	}
-	btn = rotary->initBtn(btnPin, ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this), false);
+//	btn = rotary->initBtn(btnPin, ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this), false);
+	btn = rotary->initBtn(btnPin, ButtonActionDelegate(&InfoScreens::handleButtonPress, this), false);
+
 	rotary->setOnWheelEvent(RotaryWheelActionDelegate(&InfoScreens::rotaryWheelMoved, this));
 }
 
@@ -413,20 +432,19 @@ void InfoScreens::setViewMode(ViewMode mode) {
 	this->viewMode = mode;
 	if(mode == ViewMode::INFO) {
 		btn->enableClickAndHold(false);
-		btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
+//		btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::infoModeBtnClicked, this));
 
 	} else if(mode == ViewMode::EDIT){
 		btn->enableClickAndHold(false);
-		btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
+//		btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editModeBtnClicked, this));
 		showEditParam();
 //		moveToNextEditParam();
 	}
 	else if(mode == ViewMode::EDIT_FIELD) {
 		btn->enableClickAndHold(true);
-		btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editFieldModeBtnClicked, this));
+//		btn->setOnButtonEvent(ButtonActionDelegate(&InfoScreens::editFieldModeBtnClicked, this));
 //		moveToNextEditParam();
 	}
-
 }
 
 ViewMode InfoScreens::getViewMode() {
@@ -543,7 +561,7 @@ String InfoScreens::moveToPrevValue() {
 //	debugf("InfoScreens::moveToNextValue %s, %s", id.c_str());
 	if (!paramEditValueMap.contains(id)) {
 		if(delegatedMenuEvent) {
-			if (delegatedMenuEvent(param, viewMode, InfoNextValue, "")) {
+			if (delegatedMenuEvent(param, viewMode, InfoPrevValue, "")) {
 //				debugf("moveToNextValue delegate consumed");
 			}
 			else {
@@ -739,90 +757,105 @@ void InfoScreens::print(int pIndex) {
 	internalCanUpdateDisplay = true;
 }
 
-void InfoScreens::infoModeBtnClicked(MultiFunctionButtonAction event)
-{
-	if (menuHandler) {
-		menuHandler->infoModeBtnClicked(event);
-	}
-//	switch (event) {
-//		case BTN_CLICK:
-//			debugf("click");
-//			moveRight();
-//			break;
-//		case BTN_DOUBLE_CLICK:
-////			debugf("BTN_DOUBLE_CLICK");
-//			moveLeft();
-//			break;
-//		case BTN_LONG_CLICK:
-////			debugf("BTN_LONG_CLICK, going to edit mode, %i", getCurrent()->getallEditableParams().size());
-//
-//			if(getCurrent()->getallEditableParams().size() != 0) {
-//				setViewMode(ViewMode::EDIT);
-//			}
-//			break;
-//		case BTN_HOLD_CLICK:
-////			debugf("BTN_HOLD_CLICK, going to edit mode");
-//			break;
+//void InfoScreens::infoModeBtnClicked(MultiFunctionButtonAction event)
+//{
+//	if (menuHandler) {
+//		menuHandler->infoModeBtnClicked(event);
 //	}
-}
-
-void InfoScreens::editModeBtnClicked(MultiFunctionButtonAction event)
-{
-	if (menuHandler) {
-		menuHandler->editModeBtnClicked(event);
-	}
-//	switch (event) {
-//		case BTN_CLICK:
-//			debugf("edit - click");
-//			moveToNextEditParam();
+////	switch (event) {
+////		case BTN_CLICK:
+////			debugf("click");
 ////			moveRight();
-////				handleClick();
-//			break;
-//		case BTN_DOUBLE_CLICK:
-////			debugf("return to View mode");
-//			setViewMode(ViewMode::INFO);
-//			show();
+////			break;
+////		case BTN_DOUBLE_CLICK:
+//////			debugf("BTN_DOUBLE_CLICK");
 ////			moveLeft();
-////				handleDoubleClick();
-//			break;
-//		case BTN_LONG_CLICK:
-////			debugf("edit - BTN_LONG_CLICK");
-//			setViewMode(ViewMode::EDIT_FIELD);
-////				handleHoldClick();
-//			break;
-//		case BTN_HOLD_CLICK:
-//			debugf("BTN_HOLD_CLICK");
-//			break;
+////			break;
+////		case BTN_LONG_CLICK:
+//////			debugf("BTN_LONG_CLICK, going to edit mode, %i", getCurrent()->getallEditableParams().size());
+////
+////			if(getCurrent()->getallEditableParams().size() != 0) {
+////				setViewMode(ViewMode::EDIT);
+////			}
+////			break;
+////		case BTN_HOLD_CLICK:
+//////			debugf("BTN_HOLD_CLICK, going to edit mode");
+////			break;
+////	}
+//}
+//
+//void InfoScreens::editModeBtnClicked(MultiFunctionButtonAction event)
+//{
+//	if (menuHandler) {
+//		menuHandler->editModeBtnClicked(event);
 //	}
-}
-
-void InfoScreens::editFieldModeBtnClicked(MultiFunctionButtonAction event)
-{
-	if (menuHandler) {
-		menuHandler->editFieldModeBtnClicked(event);
-	}
-//	switch (event) {
-//		case BTN_CLICK:
-////			debugf("editField - click");
-//			moveToNextValue();
-//			break;
-//		case BTN_DOUBLE_CLICK:
-////			debugf("editField - return to View mode");
-//			if(delegatedMenuEvent) {
-//				String id = getCurrent()->getCurrentEditParam()->id;
-//				String newVal = *paramValueMap[id].val;
-//				if (delegatedMenuEvent(getCurrent()->getCurrentEditParam(), viewMode, InfoParamDataSet, newVal)) {
-////					debugf("InfoParamDataSet delegate consumed");
-//					return;
-//				}
-//			}
-//			setViewMode(ViewMode::EDIT);
-//			break;
+////	switch (event) {
+////		case BTN_CLICK:
+////			debugf("edit - click");
+////			moveToNextEditParam();
+//////			moveRight();
+//////				handleClick();
+////			break;
+////		case BTN_DOUBLE_CLICK:
+//////			debugf("return to View mode");
+////			setViewMode(ViewMode::INFO);
+////			show();
+//////			moveLeft();
+//////				handleDoubleClick();
+////			break;
+////		case BTN_LONG_CLICK:
+//////			debugf("edit - BTN_LONG_CLICK");
+////			setViewMode(ViewMode::EDIT_FIELD);
+//////				handleHoldClick();
+////			break;
+////		case BTN_HOLD_CLICK:
+////			debugf("BTN_HOLD_CLICK");
+////			break;
+////	}
+//}
+//
+//void InfoScreens::editFieldModeBtnClicked(MultiFunctionButtonAction event)
+//{
+//	if (menuHandler) {
+//		menuHandler->editFieldModeBtnClicked(event);
 //	}
-}
+////	switch (event) {
+////		case BTN_CLICK:
+//////			debugf("editField - click");
+////			moveToNextValue();
+////			break;
+////		case BTN_DOUBLE_CLICK:
+//////			debugf("editField - return to View mode");
+////			if(delegatedMenuEvent) {
+////				String id = getCurrent()->getCurrentEditParam()->id;
+////				String newVal = *paramValueMap[id].val;
+////				if (delegatedMenuEvent(getCurrent()->getCurrentEditParam(), viewMode, InfoParamDataSet, newVal)) {
+//////					debugf("InfoParamDataSet delegate consumed");
+////					return;
+////				}
+////			}
+////			setViewMode(ViewMode::EDIT);
+////			break;
+////	}
+//}
 
 void InfoScreens::setOnMenuEventDelegate(MenuEventDelegate handler) {
 	delegatedMenuEvent  = handler;
+}
+
+void InfoScreens::setMenuEventHandler(MenuHandlerInterface *handler){
+	this->menuHandler = handler;
+}
+
+bool InfoScreens::callMenuEventDelegate() {
+	String id = getCurrent()->getCurrentEditParam()->id;
+	String newVal = *paramValueMap[id].val;
+	if (delegatedMenuEvent(getCurrent()->getCurrentEditParam(), getViewMode(), InfoParamDataSet, newVal)) {
+		debugf("InfoParamDataSet delegate consumed");
+		return true;
+	}
+
+	return false;
 }
 
 void InfoScreens::rotaryWheelMoved(RotaryAction event) {

@@ -39,12 +39,23 @@ int counter = 0;
 bool menuEventLister(paramStruct* data, ViewMode vmode, InfoScreenMenuAction actionType, String newValue) {
 	debugf("menuEventLister received on id=%s, viewmode=%i, actiontype=%i, newVal=%s", data->id.c_str(), vmode, actionType, newValue.c_str());
 
-	if (data->id == "ssid" && actionType == InfoScreenMenuAction::InfoNextValue) {
-		infos->updateParamValue(data->id, "test" + String(counter++));
-		if (counter>10) {
-			counter =0;
+	if (data->id == "ssid") {
+		if (actionType == InfoScreenMenuAction::InfoNextValue) {
+			counter++;
+			if (counter > 10) {
+				counter = 0;
+			}
+			infos->updateParamValue(data->id, "test" + String(counter));
+
+			return true;
+		} else if (actionType == InfoScreenMenuAction::InfoPrevValue) {
+			counter--;
+			if (counter < 0) {
+				counter = 10;
+			}
+			infos->updateParamValue(data->id, "test" + String(counter));
+			return true;
 		}
-		return true;
 	}
 
 	return false;
@@ -164,7 +175,7 @@ void doCheckBtn() {
 
 void init()
 {
-	Serial.begin(74880); // 115200
+	Serial.begin(115200); // 115200
 	Serial.systemDebugOutput(true); // Debug output to serial
 	Wire.pins(sclPin, sdaPin);
 	display = new SSD1306_Driver(16);

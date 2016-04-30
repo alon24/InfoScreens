@@ -13,6 +13,10 @@
 #include "drivers/Base_Display_Driver.h"
 #include "utils/MultiFunctionButton.h"
 #include "utils/Rotary.h"
+#include "MenuHandlers.h"
+//#include "MenuHandlerInterface.h"
+
+class MenuHandlerInterface;
 
 struct paramDataValues {
 	Vector<String*> data;
@@ -288,13 +292,16 @@ enum InfoScreenMenuAction { InfoParamDataSet = 0, InfoPrevValue = 1, InfoNextVal
  */
 typedef Delegate<bool(paramStruct* data, ViewMode v, InfoScreenMenuAction actionType, String newValue)> MenuEventDelegate;
 
-class MenuHandlerInterface {
-public:
-	virtual void infoModeBtnClicked(MultiFunctionButtonAction event);
-	virtual void editModeBtnClicked(MultiFunctionButtonAction event);
-	virtual void editFieldModeBtnClicked(MultiFunctionButtonAction event);
-	virtual void setOnMenuEventDelegate(MenuEventDelegate handler);
-};
+//class MenuHandlerInterface {
+//public:
+//	MenuHandlerInterface(){}
+//	virtual ~MenuHandlerInterface();
+//
+//	virtual void infoModeBtnClicked(MultiFunctionButtonAction event);
+//	virtual void editModeBtnClicked(MultiFunctionButtonAction event);
+//	virtual void editFieldModeBtnClicked(MultiFunctionButtonAction event);
+//	virtual void setOnMenuEventDelegate(MenuEventDelegate handler);
+//};
 
 class InfoScreens : public BaseInfoElement{
 
@@ -314,12 +321,13 @@ private:
 
 	MenuEventDelegate delegatedMenuEvent;
 	EditModeBlinkingInfo editModeBlinkInfo;
-public:
 	MenuHandlerInterface *menuHandler;
+public:
+
 	InfoScreens(Base_Display_Driver *dis, int btnPin);
 	InfoScreens(Base_Display_Driver *dis);
 
-	~InfoScreens();
+	virtual ~InfoScreens();
 	void initMFButton(int btnPin);
 	void initRotary(int btnPin, int encoderCLK, int encoderDT);
 
@@ -350,7 +358,8 @@ public:
 	void setOnMenuEventDelegate(MenuEventDelegate handler);
 	void rotaryWheelMoved(RotaryAction event);
 
-
+	void setMenuEventHandler(MenuHandlerInterface *handler);
+	bool callMenuEventDelegate();
 private:
 
 	void handleScreenUpdateTimer();
@@ -359,9 +368,10 @@ private:
 	void drawEditModeSign(int x, int y, int color);
 	void drawBlinkParamLine(paramStruct* p, int color);
 
-	void infoModeBtnClicked(MultiFunctionButtonAction event);
-	void editModeBtnClicked(MultiFunctionButtonAction event);
-	void editFieldModeBtnClicked(MultiFunctionButtonAction event);
+	void handleButtonPress(MultiFunctionButtonAction event);
+//	void infoModeBtnClicked(MultiFunctionButtonAction event);
+//	void editModeBtnClicked(MultiFunctionButtonAction event);
+//	void editFieldModeBtnClicked(MultiFunctionButtonAction event);
 
 };
 
